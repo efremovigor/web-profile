@@ -1,0 +1,54 @@
+{{define "head"}}
+<link href="static/profile/style.css" type="text/css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" type="text/css" rel="stylesheet" />
+{{ end }}
+{{define "content"}}
+<div class="profile_content">
+  <div class="profile">
+    <div class="img-area">
+      <div class="inner-area">
+        <a href="/full"><img src="static/profile/content/photo.jpg" alt=""></a>
+      </div>
+    </div>
+    <div class="name"><a href="/full">Igor Efremov</a></div>
+    <div class="about">Backend developer</div>
+    <div class="social-icons">
+      <a href="https://vk.com/igore" class="vk"><i class="fa-brands fa-vk"></i></a>
+      <a href="https://github.com/efremovigor" class="github"><i class="fa-brands fa-github"></i></a>
+      <a href="mailto:igor198811@gmail.com" class="gmail"><i class="fa-brands fa-google"></i></i></a>
+      <a href="https://t.me/Igor198811" class="telegram"><i class="fa-brands fa-telegram"></i></a>
+      <a href="https://www.instagram.com/igor.efremov.1988/" class="instagram"><i class="fa-brands fa-instagram"></i></a>
+    </div>
+    <section class="tags_box">
+      <p>Technical Skills</p>
+      <ul class="tags-set">
+        <li>10+ years of software development</li>
+        <li>php</li>
+        <li>sql</li>
+        <li>git</li>
+        <li>golang</li>
+        <li>debian</li>
+        <li>elastic search</li>
+        <li>docker</li>
+        <li>microservices</li>
+        <li>redis</li>
+        <li>competitive access</li>
+        <li>phpunit</li>
+        <li>phpstorm</li>
+        <li>jira</li>
+        <li>postman</li>
+      </ul>
+    </section>
+    <section class="tags_box">
+      <p>Workplaces</p>
+      <ul class="tags-set">
+        <li><a href="https://petrovich.ru">петрович тех</a></li>
+        <li><a href="https://www.alyce.com/">alyce</a></li>
+        <li>gardenmoto</li>
+        <li>кальвера</li>
+        <li><a href="https://www.majordomo.ru/">majordomo</a></li>
+      </ul>
+    </section>
+  </div>
+</div>
+{{ end }}
