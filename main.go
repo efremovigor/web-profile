@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/acme/autocert"
+	"golang.org/x/sync/errgroup"
 	"html/template"
 	"io"
 	"net/http"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 	"web_profile/env"
 )
@@ -31,42 +31,52 @@ func redirectTLS(w http.ResponseWriter, r *http.Request) {
 func run(ctx context.Context, w io.Writer, args []string) error {
 	logger := logrus.New()
 	config := env.LoadConfig()
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func(logger *logrus.Logger) {
-		defer wg.Done()
-		if err := http.ListenAndServe(env.LoadConfig().GetHttpSocket(), http.HandlerFunc(redirectTLS)); err != nil {
-			logger.Fatalf("ListenAndServe error: %v", err)
-		}
-	}(logger)
+	httpServer := &http.Server{Addr: env.LoadConfig().GetHttpSocket(), Handler: http.HandlerFunc(redirectTLS)}
 
-	httpServer := &http.Server{Handler: NewServer(logger)}
-	if env.LoadConfig().IsDev() {
-		httpServer.Addr = config.GetHttpsSocket()
-	}
-	wg.Add(1)
-	go func(logger *logrus.Logger) {
-		defer wg.Done()
+	g, gCtx := errgroup.WithContext(ctx)
+	g.Go(func() error {
+		defer gCtx.Done()
 		logger.Infof("listening on http://%s\n", httpServer.Addr)
+		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Warningf("ListenAndServe error: %v", err)
+		}
+		return nil
+	})
+	httpsServer := &http.Server{Handler: NewServer(logger)}
+	if env.LoadConfig().IsDev() {
+		httpsServer.Addr = config.GetHttpsSocket()
+	}
+	g.Go(func() error {
+		defer gCtx.Done()
+		logger.Infof("listening on http://%s\n", httpsServer.Addr)
 		if config.IsDev() {
-			if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-				logger.Fatalf("error listening and serving: %s\n", err)
+			if err := httpsServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+				logger.Warningf("error listening and serving: %s\n", err)
 			}
 		} else {
-			if err := httpServer.Serve(autocert.NewListener(config.Domain)); err != nil && err != http.ErrServerClosed {
-				logger.Fatalf("error listening and serving: %s\n", err)
+			if err := httpsServer.Serve(autocert.NewListener(config.Domain)); err != nil && err != http.ErrServerClosed {
+				logger.Warningf("error listening and serving: %s\n", err)
 			}
 		}
-	}(logger)
-	wg.Add(1)
-	go func(logger *logrus.Logger) {
-		defer wg.Done()
+		return nil
+	})
+	g.Go(func() error {
+		defer gCtx.Done()
 		<-ctx.Done()
 		if err := httpServer.Shutdown(ctx); err != nil {
-			logger.Fatalf("error shutting down http server: %s\n", err)
+			logger.Warningf("error shutting down http server: %s\n", err)
 		}
-	}(logger)
-	wg.Wait()
+
+		if err := httpsServer.Shutdown(ctx); err != nil {
+			logger.Warningf("error shutting down https server: %s\n", err)
+		}
+		return nil
+	})
+	err := g.Wait()
+	if err != nil {
+		logger.Warningf("Error gracefull done : %s", err)
+	}
+	logger.Infof("Success gracefull done")
 	return nil
 }
 
