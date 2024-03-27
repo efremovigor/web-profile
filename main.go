@@ -17,7 +17,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
+	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM, syscall.SIGKILL)
 	defer cancel()
 	if err := run(ctx, os.Stdout, os.Args); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
@@ -36,9 +36,9 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	g, gCtx := errgroup.WithContext(ctx)
 	g.Go(func() error {
 		defer gCtx.Done()
-		logger.Infof("listening on http://%s\n", httpServer.Addr)
+		logger.Infof("listening on %s\n", httpServer.Addr)
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Warningf("ListenAndServe error: %v", err)
+			logger.Warningf("error listening and serving: %v", err)
 		}
 		return nil
 	})
@@ -48,12 +48,13 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	}
 	g.Go(func() error {
 		defer gCtx.Done()
-		logger.Infof("listening on http://%s\n", httpsServer.Addr)
 		if config.IsDev() {
+			logger.Infof("listening on http://%s\n", httpsServer.Addr)
 			if err := httpsServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 				logger.Warningf("error listening and serving: %s\n", err)
 			}
 		} else {
+			logger.Infof("listening on https://%s\n", config.Domain)
 			if err := httpsServer.Serve(autocert.NewListener(config.Domain)); err != nil && err != http.ErrServerClosed {
 				logger.Warningf("error listening and serving: %s\n", err)
 			}
@@ -70,6 +71,7 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 		if err := httpsServer.Shutdown(ctx); err != nil {
 			logger.Warningf("error shutting down https server: %s\n", err)
 		}
+
 		return nil
 	})
 	err := g.Wait()

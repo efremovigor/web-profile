@@ -7,6 +7,7 @@ import (
 )
 
 const envPath = "./.env"
+const ip = "0.0.0.0"
 
 type Config struct {
 	Env    string
@@ -26,14 +27,14 @@ func (e Config) GetHttpsUrl() string {
 
 func (e Config) GetHttpSocket() string {
 	if e.IsDev() {
-		return e.Domain + ":8080"
+		return ":8080"
 	}
-	return e.Domain + ":80"
+	return ":80"
 }
 
 func (e Config) GetHttpsSocket() string {
 	if e.IsDev() {
-		return e.Domain + ":8081"
+		return ip + ":8081"
 	}
 	return e.Domain + ":443"
 }
