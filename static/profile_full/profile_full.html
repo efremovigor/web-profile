@@ -55,6 +55,9 @@
 </header>
 <div class="page-content">
   <div class="container">
+    <button class="menu-button">
+      <a href="/"><i class="fa-solid fa-arrow-up"></i></a>
+    </button>
 <div class="cover shadow-lg bg-white">
 <div class="cover-bg p-3 p-lg-4 text-white">
 <div class="row">
@@ -80,7 +83,10 @@
         <div class="pb-1">Age</div>
       </div>
       <div class="col-sm-8">
-        <div class="pb-1 text-secondary">36</div>
+        <div class="pb-1 text-secondary" id="myYears">37</div>
+        <script>
+          document.getElementById('myYears').textContent = new Date().getFullYear() - 1988;
+        </script>
       </div>
       <div class="col-sm-4">
         <div class="pb-1">Email</div>
@@ -98,7 +104,7 @@
         <div class="pb-1">Address</div>
       </div>
       <div class="col-sm-8">
-        <div class="pb-1 text-secondary">24, staroderevenskaya street, saint-petersburg, Russia Federation</div>
+        <div class="pb-1 text-secondary">24, Staroderevenskaya street, Saint-Petersburg, Russia Federation</div>
       </div>
     </div>
   </div>
@@ -155,192 +161,195 @@
 </div>
 </div>
 <hr class="d-print-none"/>
-<div class="work-experience-section px-3 px-lg-4">
-<h2 class="h3 mb-4">Work Experience</h2>
-<div class="timeline">
-  <div class="timeline-card timeline-card-primary card shadow-sm">
-    <div class="card-body">
-      <div class="h5 mb-1">Старший Web-программист <span class="text-muted h6">в Петрович ТЕХ</span></div>
-      <div class="text-muted text-small mb-2">Июль, 2022 - Present</div>
-      <div>Организация конкурентного доступа к данным</br>
-        Оптимизация работы кода</br>
-        Переезд библиотек и сервисов на новые версии php(7.2 - 8.2)</br>
-        Внедрение phpstan</br>
-        Переезд кода в микросервисы</br>
+<ul class="nav nav-tabs custom-tabs" id="myTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="work-tab" data-bs-toggle="tab" data-bs-target="#work" type="button" role="tab">
+      <i class="fas fa-briefcase"></i> Work Experience
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="education-tab" data-bs-toggle="tab" data-bs-target="#education" type="button" role="tab">
+      <i class="fas fa-graduation-cap"></i> Education
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="homework-tab" data-bs-toggle="tab" data-bs-target="#homework" type="button" role="tab">
+      <i class="fa-solid fa-house"></i> Homework
+    </button>
+  </li>
+</ul>
+<div class="tab-content mt-3" id="myTabContent">
+  <div class="tab-pane fade show active" id="work" role="tabpanel">
+        <div class="work-experience-section px-3 px-lg-4">
+          <div class="timeline">
+            <div class="timeline-card timeline-card-primary card shadow-sm">
+              <div class="card-body">
+                <div class="h5 mb-1">Старший Web-программист <span class="text-muted h6">в Петрович ТЕХ</span></div>
+                <div class="text-muted text-small mb-2">Июль, 2022 - Present</div>
+                <div>Организация конкурентного доступа к данным</br>
+                  Оптимизация работы кода</br>
+                  Переезд библиотек и сервисов на новые версии php(7.2 - 8.2)</br>
+                  Внедрение phpstan</br>
+                  Переезд кода в микросервисы</br>
+                  Создание индексов в ElasticSearch для поиска данных</br>
+                  Валидация ответов api, согласно описанной опенапи (osteel/openapi-httpfoundation-testing)</br>
+                  Внедрение глобавльных метрик в приложении (время работы)</br>
+                  Работа с событиями kafka</br>
+                  Прокси сервер для фикстурных ответов на Golang</br>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-card timeline-card-primary card shadow-sm">
+              <div class="card-body">
+                <div class="h5 mb-1">Senior Backend Engineer <span class="text-muted h6">at Alyce</span></div>
+                <div class="text-muted text-small mb-2">Сентябрь, 2020 - Июль, 2022</div>
+                <div>
+                  Developing API's - openapi</br>
+                  Actions on PHP</br>
+                  Migrations, optimisations, refactoring</br>
+                  Integration tests on kotlin</br>
+                  Integrations external services</br>
+                  Review and discussing tech solutions.</div>
+              </div>
+            </div>
+            <div class="timeline-card timeline-card-primary card shadow-sm">
+              <div class="card-body">
+                <div class="h5 mb-1">Старший программист <span class="text-muted h6">в Петрович, Строительный Торговый Дом</span></div>
+                <div class="text-muted text-small mb-2">Декабрь, 2017 - Сентябрь, 2020</div>
+                <div>Оптимизация сервисов компании</br>
+                  Работа над архитектурой приложения</br>
+                  Go прототипы (не продакшен)</br>
+                  Написание базовых компонентов ядра с нуля на нативе( DI, CircuitBreaker, Serializer, DataProvider, EventDispatcher, Validator)</br>
+                  Внешние и внутренние интеграции(платежные системы,soap/json rpc)</br>
+                  Распиливание монолита, работа над архитектурой библиотек</br>
+                  Покрытие тестами(Unit, Integration,API)</br>
+                  Написание различных API.</div>
+              </div>
+            </div>
+            <div class="timeline-card timeline-card-primary card shadow-sm">
+              <div class="card-body">
+                <div class="h5 mb-1">Web-программист <span class="text-muted h6">в Gardenmoto/12Соток</span></div>
+                <div class="text-muted text-small mb-2">Май, 2016 - Декабрь, 2017</div>
+                <div>Разработка нового функционала</br>
+                  Проектирование БД</br>
+                  Оптимизация БД</br>
+                  Внесение всех проектов под GIT</br>
+                  Разделение веб-серверов</br>
+                  Оптимизация работы серверов</br>
+                  Разделение проектов</br>
+                  Работа над сервисами компании - "под ключ"</br>
+                  Работа Yandex метрикой</br>
+                  Внедрение Google Воронки</br>
+                  Внедрение API - Кладр/YMAP/DPD/Деловые линии</br>
+                  Реализация адаптера - BI сервера на Symfony(3.*) на основе PHP-FPM</br>
+                  Написание клиента для работы с PHP-FPM сервером</br>
+                  Плотная работа из под Docker, также-же опыт с SCSS/SASS и знакомство с Gulp</br>
+                  Самостоятельный выбор технической реализации всех задач</br>
+                  Проектирование работы Веб-сервисов с 1С</br>
+                  Настройка Nginx</br>
+                  Настройка системы кеширования на базе Redis. Bash скрипты(деплой)</div>
+              </div>
+            </div>
+            <div class="timeline-card timeline-card-primary card shadow-sm">
+              <div class="card-body">
+                <div class="h5 mb-1">Программист <span class="text-muted h6">в Кальвера</span></div>
+                <div class="text-muted text-small mb-2">Май, 2015 - Май, 2016</div>
+                <div>Внедненние API в проект</br>Работа в большой комманде</br>Agile, Scrum</br>Внедренние методологии тестирования в проект</br>
+                  Написание автотестов всех уровней</br>
+                  Изначальная работа на Merc, потом перешли на Git</br>
+                  Небольшой опыт работы из под Docker
+                </div>
+              </div>
+            </div>
+            <div class="timeline-card timeline-card-primary card shadow-sm">
+              <div class="card-body">
+                <div class="h5 mb-1">Web - программист <span class="text-muted h6">в Majordomo</span></div>
+                <div class="text-muted text-small mb-2">Октябрь, 2012 - Май, 2015</div>
+                <div>Поддержка биллинговых систем</br>
+                  Поддержка старых проектов и участие в создании новых</br>
+                  Интеграция платежных систем ( yandex, paypal )</br>
+                  Опыт разработки MVC
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  </div>
+  <div class="tab-pane fade" id="education" role="tabpanel">
+        <div class="education-section px-3 px-lg-4 pb-4">
+          <div class="timeline">
+            <div class="timeline-card timeline-card-success card shadow-sm">
+              <div class="card-body">
+                <div class="h5 mb-1">Инженер по специальности "Управление и информатика в технических системах" <span class="text-muted h6">из Северо-Западного государственного заочного технического университета</span></div>
+                <div class="text-muted text-small mb-2">2005 - 2011</div>
+              </div>
+            </div>
+          </div>
+        </div>
+  </div>
+  <div class="tab-pane fade" id="homework" role="tabpanel">
+    <div class="education-section px-3 px-lg-4 pb-4">
+      <div class="timeline">
+        <div class="timeline-card timeline-card-warning card shadow-sm">
+          <div class="card-body">
+          <h2 class="card-title"><a class="nav-link" href="https://github.com/efremovigor/go-labyrinth"><i class="fa-solid fa-link"></i>Лабиринт</a></h2>
+          <div class="row">
+              <div class="col-md-4">
+                <ul>
+                  <li>Генерирует каждый раз уникальный новый лабиринт</li>
+                  <li>Реализовано прохождение его ботом</li>
+                  <li>Реализована управление в режиме Player vs Bot</li>
+                  </ul>
+                </div>
+              <div class="col-md-8">
+                <img src="https://raw.githubusercontent.com/efremovigor/go-labyrinth/refs/heads/master/lab_demo1.gif" style="max-width: 800px; max-height: 400px;" />
+              </div>
+          </div>
+        </div>
+        </div>
+        <div class="timeline-card timeline-card-warning card shadow-sm">
+          <div class="card-body">
+          <h2 class="card-title"><a class="nav-link" href="https://github.com/efremovigor/telegram-bot-golang"><i class="fa-solid fa-link"></i>Бот-ассистент по английскому языку</a></h2>
+          <div class="row">
+            <div class="col-md-8">
+              <div>
+                Telegram Бот-помошник, который за тебя пытается найти перевод и сделать анализ слов и строк получая информацию парся сторонние ресурсы<br>
+                Такие ресурсы как<br>
+                <ul>
+                  <li><b>dictionary.cambridge.org</b></li>
+                  <li><b>multitran.com</b></li>
+                  <li><b>wooordhunt.ru</b></li>
+                </ul>
+                Умеет отдавать информацию разными способами, картинки, аудиосообщения
+                Также встроена база(mysql) куда пишутся всё что мы искали и делается кеш(redis) сырых/полусырых данных, того что уже искали
+              </div>
+            </div>
+            <div class="col-md-2">
+              <img src="https://github.com/efremovigor/telegram-bot-golang/blob/master/demo.gif?raw=true" style="max-width: 800px; max-height: 500px;"/>
+            </div>
+          </div>
+          </div>
+        </div>
+        <div class="timeline-card timeline-card-warning card shadow-sm">
+          <div class="card-body">
+            <h2 class="card-title"><a class="nav-link" href="https://github.com/efremovigor/game"><i class="fa-solid fa-link"></i>Сетевая игра на Go</a></h2>
+            <div class="row">
+              <div class="col-md-8">
+                <div>
+                  Сетевая игра на Go, все вычисления на бекенде, поддерживает лобби<br>
+                  Движение - WASD, Атака - space. Целиться - мышь<br>
+                <img src="https://github.com/efremovigor/game/raw/master/network_demo.gif" style="max-width: 800px; max-height: 500px;"/>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <div class="timeline-card timeline-card-primary card shadow-sm">
-    <div class="card-body">
-      <div class="h5 mb-1">Senior Backend Engineer <span class="text-muted h6">at Alyce</span></div>
-      <div class="text-muted text-small mb-2">Сентябрь, 2020 - Июль, 2022</div>
-      <div>
-        Developing API's - openapi</br>
-        Actions on PHP</br>
-        Migrations, optimisations, refactoring</br>
-        Integration tests on kotlin</br>
-        Integrations external services</br>
-        Review and discussing tech solutions.</div>
-    </div>
-  </div>
-  <div class="timeline-card timeline-card-primary card shadow-sm">
-    <div class="card-body">
-      <div class="h5 mb-1">Старший программист <span class="text-muted h6">в Петрович, Строительный Торговый Дом</span></div>
-      <div class="text-muted text-small mb-2">Декабрь, 2017 - Сентябрь, 2020</div>
-      <div>Оптимизация сервисов компании</br>
-        Работа над архитектурой приложения</br>
-        Go прототипы (не продакшен)</br>
-        Написание базовых компонентов ядра с нуля на нативе( DI, CircuitBreaker, Serializer, DataProvider, EventDispatcher, Validator)</br>
-        Внешние и внутренние интеграции(платежные системы,soap/json rpc)</br>
-        Распиливание монолита, работа над архитектурой библиотек</br>
-        Покрытие тестами(Unit, Integration,API)</br>
-        Написание различных API.</div>
-    </div>
-  </div>
-  <div class="timeline-card timeline-card-primary card shadow-sm">
-    <div class="card-body">
-      <div class="h5 mb-1">Web-программист <span class="text-muted h6">в Gardenmoto/12Соток</span></div>
-      <div class="text-muted text-small mb-2">Май, 2016 - Декабрь, 2017</div>
-      <div>Разработка нового функционала</br>
-        Проектирование БД</br>
-        Оптимизация БД</br>
-        Внесение всех проектов под GIT</br>
-        Разделение веб-серверов</br>
-        Оптимизация работы серверов</br>
-        Разделение проектов</br>
-        Работа над сервисами компании - "под ключ"</br>
-        Работа Yandex метрикой</br>
-        Внедрение Google Воронки</br>
-        Внедрение API - Кладр/YMAP/DPD/Деловые линии</br>
-        Реализация адаптера - BI сервера на Symfony(3.*) на основе PHP-FPM</br>
-        Написание клиента для работы с PHP-FPM сервером</br>
-        Плотная работа из под Docker, также-же опыт с SCSS/SASS и знакомство с Gulp</br>
-        Самостоятельный выбор технической реализации всех задач</br>
-        Проектирование работы Веб-сервисов с 1С</br>
-        Настройка Nginx</br>
-        Настройка системы кеширования на базе Redis. Bash скрипты(деплой)</div>
-    </div>
-  </div>
-  <div class="timeline-card timeline-card-primary card shadow-sm">
-    <div class="card-body">
-      <div class="h5 mb-1">Программист <span class="text-muted h6">в Кальвера</span></div>
-      <div class="text-muted text-small mb-2">Май, 2015 - Май, 2016</div>
-      <div>Внедненние API в проект</br>Работа в большой комманде</br>Agile, Scrum</br>Внедренние методологии тестирования в проект</br>
-        Написание автотестов всех уровней</br>
-        Изначальная работа на Merc, потом перешли на Git</br>
-        Небольшой опыт работы из под Docker
-      </div>
-    </div>
-  </div>
-  <div class="timeline-card timeline-card-primary card shadow-sm">
-    <div class="card-body">
-      <div class="h5 mb-1">Web - программист <span class="text-muted h6">в Majordomo</span></div>
-      <div class="text-muted text-small mb-2">Октябрь, 2012 - Май, 2015</div>
-      <div>Поддержка биллинговых систем</br>
-        Поддержка старых проектов и участие в создании новых</br>
-        Интеграция платежных систем ( yandex, paypal )</br>
-        Опыт разработки MVC
-      </div>
-    </div>
-  </div>
-</div>
 </div>
 <hr class="d-print-none"/>
-<div class="page-break"></div>
-<div class="education-section px-3 px-lg-4 pb-4">
-<h2 class="h3 mb-4">Education</h2>
-<div class="timeline">
-  <div class="timeline-card timeline-card-success card shadow-sm">
-    <div class="card-body">
-      <div class="h5 mb-1">Инженер по специальности "Управление и информатика в технических системах" <span class="text-muted h6">из Северо-Западного государственного заочного технического университета</span></div>
-      <div class="text-muted text-small mb-2">2005 - 2011</div>
-    </div>
-  </div>
-</div>
-</div>
-<hr class="d-print-none"/>
-<!--<div class="contant-section px-3 px-lg-4 pb-4" id="contact">-->
-<!--<h2 class="h3 text mb-3">Contact</h2>-->
-<!--<div class="row">-->
-<!--  <div class="col-md-7 d-print-none">-->
-<!--    <div class="my-2"><form action="https://formspree.io/your@email.com"-->
-<!--method="POST">-->
-<!--<div class="row">-->
-<!--<div class="col-6">-->
-<!--  <input class="form-control" type="text" id="name" name="name" placeholder="Your Name" required>-->
-<!--</div>-->
-<!--<div class="col-6">-->
-<!--  <input class="form-control" type="email" id="email" name="_replyto" placeholder="Your E-mail" required>-->
-<!--</div>-->
-<!--</div>-->
-<!--<div class="form-group my-2">-->
-<!--<textarea class="form-control" style="resize: none;" id="message" name="message" rows="4"  placeholder="Your Message" required></textarea>-->
-<!--</div>-->
-<!--<button class="btn btn-primary mt-2" type="submit">Send</button>-->
-<!--</form>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--  <div class="col">-->
-<!--    <div class="mt-2">-->
-<!--      <h3 class="h6">Address</h3>-->
-<!--      <div class="pb-2 text-secondary">140, City Center, New York, U.S.A</div>-->
-<!--      <h3 class="h6">Phone</h3>-->
-<!--      <div class="pb-2 text-secondary">+0718-111-0011</div>-->
-<!--      <h3 class="h6">Email</h3>-->
-<!--      <div class="pb-2 text-secondary">Joyce@company.com</div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--  <div class="col d-none d-print-block">-->
-<!--    <div class="mt-2">-->
-<!--      <div>-->
-<!--        <div class="mb-2">-->
-<!--          <div class="text-dark"><i class="fab fa-twitter mr-1"></i><span>https://twitter.com/templateflip</span>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <div class="mb-2">-->
-<!--          <div class="text-dark"><i class="fab fa-facebook mr-1"></i><span>https://www.facebook.com/templateflip</span>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <div class="mb-2">-->
-<!--          <div class="text-dark"><i class="fab fa-instagram mr-1"></i><span>https://www.instagram.com/templateflip</span>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <div class="mb-2">-->
-<!--          <div class="text-dark"><i class="fab fa-github mr-1"></i><span>https://github.com/templateflip</span>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</div>-->
-<!--</div>-->
 </div></div>
 </div>
-<!--<footer class="pt-4 pb-4 text-muted text-center d-print-none">-->
-<!--  <div class="container">-->
-<!--    <div class="my-3">-->
-<!--      <div class="h4">Joyce Harrison</div>-->
-<!--      <div class="footer-nav">-->
-<!--        <nav role="navigation">-->
-<!--          <ul class="nav justify-content-center">-->
-<!--            <li class="nav-item"><a class="nav-link" href="https://twitter.com/templateflip" title="Twitter"><i class="fab fa-twitter"></i><span class="menu-title sr-only">Twitter</span></a>-->
-<!--            </li>-->
-<!--            <li class="nav-item"><a class="nav-link" href="https://www.facebook.com/templateflip" title="Facebook"><i class="fab fa-facebook"></i><span class="menu-title sr-only">Facebook</span></a>-->
-<!--            </li>-->
-<!--            <li class="nav-item"><a class="nav-link" href="https://www.instagram.com/templateflip" title="Instagram"><i class="fab fa-instagram"></i><span class="menu-title sr-only">Instagram</span></a>-->
-<!--            </li>-->
-<!--            <li class="nav-item"><a class="nav-link" href="https://github.com/templateflip" title="Github"><i class="fab fa-github"></i><span class="menu-title sr-only">Github</span></a>-->
-<!--            </li>-->
-<!--          </ul>-->
-<!--        </nav>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <div class="text-small">-->
-<!--      <div class="mb-1">&copy; Right Resume. All rights reserved.</div>-->
-<!--      <div>Design - <a href="https://templateflip.com/" target="_blank">TemplateFlip</a></div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</footer>-->
 <script src="static/profile_full/scripts/bootstrap.bundle.min.js?ver=1.2.0"></script>
 <script src="static/profile_full/scripts/aos.js?ver=1.2.0"></script>
 <script src="static/profile_full/scripts/main.js?ver=1.2.0"></script>

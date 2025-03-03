@@ -56,6 +56,15 @@
 .timeline-card-success:after {
   background-color: #37BC9B; }
 
+.timeline-card-warning {
+  border-left-color: #9e9334; }
+
+.timeline-card-warning:before {
+  border-color: #9e9334; }
+
+.timeline-card-warning:after {
+  background-color: #9e9334; }
+
 html {
   scroll-behavior: smooth; }
 
@@ -139,3 +148,85 @@ footer a:not(.nav-link) {
   .page-break {
     padding-top: 5rem;
     page-break-before: always; } }
+.custom-tabs {
+  border-bottom: none !important; /* Убираем линию снизу */
+  display: flex;
+}
+
+.custom-tabs .nav-item {
+  flex: 1; /* Равномерное распределение вкладок */
+  text-align: center;
+}
+
+.custom-tabs .nav-link {
+  color: #333;
+  font-weight: 500;
+  padding: 10px 15px;
+  border: none;
+  background: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  width: 100%; /* Фиксируем размер */
+  height: 40px; /* Даем одинаковую высоту */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-tabs .nav-link.active {
+  color: #000;
+  font-weight: bold;
+}
+
+.custom-tabs .nav-item:not(:last-child) .nav-link {
+  border-right: 1px solid #ddd; /* Разделитель между вкладками */
+}
+
+.custom-tabs .nav-link:focus,
+.custom-tabs .nav-link:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.custom-tabs .nav-link i {
+  margin-right: 5px;
+}
+
+.card-body {
+  overflow: hidden;
+}
+.card-body .nav-link {
+  display: inline-block;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.nav-link i {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  font-size: 1rem;
+  margin-top: -3px;
+  margin-right: 5px;
+}
+.container {
+  position: relative;
+}
+
+.container .menu-button {
+  position: absolute;
+  top: 10px;
+  right: 30px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.menu-button i {
+  color:#343a40;
+}
+.profile_content  .menu-button:hover {
+  opacity: 1;
+}
