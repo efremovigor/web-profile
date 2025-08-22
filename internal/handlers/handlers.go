@@ -10,19 +10,8 @@ import (
 func ProfileHandler(logger *logrus.Logger) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			tmpl := template.Must(template.ParseFiles("static/profile/profile.html", "static/index.html"))
-			if err := tmpl.ExecuteTemplate(w, "index", nil); err != nil {
-				logger.Fatalf("error rendering template: %s\n", err)
-			}
-		},
-	)
-}
-
-func ProfileFullHandler(logger *logrus.Logger) http.Handler {
-	return http.HandlerFunc(
-		func(w http.ResponseWriter, r *http.Request) {
-			tmpl := template.Must(template.ParseFiles("static/profile_full/profile_full.html", "static/index.html"))
-			if err := tmpl.ExecuteTemplate(w, "index", nil); err != nil {
+			tmpl := template.Must(template.ParseFiles("static/index.html"))
+			if err := tmpl.Execute(w, nil); err != nil {
 				logger.Fatalf("error rendering template: %s\n", err)
 			}
 		},

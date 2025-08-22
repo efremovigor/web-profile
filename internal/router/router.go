@@ -90,7 +90,6 @@ func addRoutes(
 	logger *logrus.Logger,
 ) {
 	mux.Handle("/", handlers.ProfileHandler(logger))
-	mux.Handle("/full", handlers.ProfileFullHandler(logger))
 	fs := http.FileServer(http.Dir("static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
 }

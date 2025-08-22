@@ -1,15 +1,805 @@
-{{define "index"}}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    {{template "head" .}}
-    <meta charset="UTF-8">
-    <title>Efremov Igor | Profile</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IT Specialist Portfolio - Igor Efremov</title>
+    <meta name="description" content="Portfolio of Igor Efremov, Senior Backend Developer with 10+ years of experience in PHP, Golang, microservices, and scalable systems." />
+    <link rel="icon" href="favicon.ico" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- AOS animation -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #6366f1 0%, #ec4899 50%, #facc15 100%);
+        }
+        .project-card:hover {
+            transform: translateY(-8px) rotate3d(1,1,0,3deg);
+            transition: 0.4s;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.3; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        .animate-float {
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 60s linear infinite;
+        }
+
+        @keyframes pulse-slow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .animate-pulse-slow {
+            animation: pulse-slow 10s ease-in-out infinite;
+        }
+        .pointer-events-none {
+            pointer-events: none;
+        }
+    </style>
 </head>
-<body>
-<link href="static/style.css" type="text/css" rel="stylesheet">
-<script type="text/javascript" src="static/script.js"></script>
-{{template "content" .}}
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 relative">
+<div class="absolute inset-0 overflow-hidden">
+    <!-- Большой круг (почти фон) -->
+    <div class="absolute top-[-100px] left-[10%] w-160 h-160 bg-indigo-400 rounded-full opacity-10 animate-float"></div>
+
+    <!-- Маленький кружок -->
+    <div class="absolute top-[15%] left-[70%] w-20 h-20 bg-pink-500 rounded-full opacity-30 animate-pulse-slow"></div>
+
+    <!-- Длинный овал -->
+    <div class="absolute top-[40%] left-[5%] w-24 h-88 bg-green-400 rounded-full opacity-15 animate-spin-slow"></div>
+
+    <!-- Маленький квадрат -->
+    <div class="absolute top-[55%] left-[60%] w-16 h-16 bg-yellow-400 opacity-20 rotate-12 animate-float"></div>
+
+    <!-- Огромный овал справа -->
+    <div class="absolute top-[20%] right-[-200px] w-192 h-96 bg-pink-300 rounded-full opacity-10 animate-spin-slow"></div>
+
+    <!-- Ромбик -->
+    <div class="absolute top-[70%] left-[40%] w-28 h-28 bg-purple-500 opacity-20 rotate-45 animate-float"></div>
+
+    <!-- Большой круг снизу -->
+    <div class="absolute bottom-[-160px] right-[15%] w-144 h-144 bg-indigo-300 rounded-full opacity-10 animate-pulse-slow"></div>
+
+    <!-- Маленький квадрат внизу -->
+    <div class="absolute bottom-[12%] left-[40%] w-12 h-12 bg-red-400 rounded-lg opacity-25 animate-spin-slow"></div>
+
+    <!-- Узкий горизонтальный овал -->
+    <div class="absolute bottom-[5%] left-[5%] w-112 h-24 bg-cyan-400 rounded-full opacity-15 animate-float"></div>
+
+    <!-- Огромный бледный круг сверху справа -->
+    <div class="absolute top-[-240px] right-[5%] w-192 h-192 bg-yellow-200 rounded-full opacity-5 animate-float"></div>
+
+    <!-- Маленький треугольник-имитация (квадрат с сильным поворотом) -->
+    <div class="absolute top-[25%] left-[80%] w-24 h-24 bg-pink-400 opacity-25 rotate-45 animate-spin-slow"></div>
+
+    <!-- Средний круг в центре -->
+    <div class="absolute top-[45%] left-[45%] w-140 h-40 bg-blue-400 rounded-full opacity-20 animate-pulse-slow"></div>
+
+    <!-- Маленький овал возле низа -->
+    <div class="absolute bottom-[20%] left-[15%] w-20 h-32 bg-green-300 rounded-full opacity-30 animate-float"></div>
+
+    <!-- Узкий вертикальный прямоугольник справа -->
+    <div class="absolute top-[60%] right-[8%] w-12 h-64 bg-purple-400 opacity-15 animate-spin-slow"></div>
+
+    <!-- Большой горизонтальный овал снизу -->
+    <div class="absolute bottom-[-120px] left-[30%] w-160 h-64 bg-cyan-300 rounded-full opacity-10 animate-float"></div>
+
+    <!-- Маленький круг на 1/4 страницы -->
+    <div class="absolute top-[28%] left-[25%] w-16 h-16 bg-red-500 rounded-full opacity-30 animate-pulse-slow"></div>
+
+    <!-- Большой квадрат с вращением -->
+    <div class="absolute bottom-[30%] right-[35%] w-48 h-48 bg-indigo-500 opacity-20 rotate-12 animate-spin-slow"></div>
+
+    <!-- Микро-точка для детализации -->
+    <div class="absolute bottom-[10%] left-[70%] w-8 h-8 bg-white rounded-full opacity-40 animate-bounce"></div>
+
+    <div class="absolute top-[31%] left-[75%] w-24 h-24 bg-blue-400 opacity-20 rounded-lg animate-bounce"></div>
+    <div class="absolute top-[49%] left-[30%] w-32 h-32 bg-purple-500 opacity-15 rounded-full animate-spin-slow"></div>
+    <div class="absolute top-[42%] left-[55%] w-28 h-14 bg-green-400 opacity-15 rounded-full animate-float"></div>
+    <div class="absolute top-[36%] left-[20%] w-20 h-20 bg-pink-400 opacity-25 rotate-45 animate-pulse"></div>
+</div>
+
+<!-- Header -->
+<header class="fixed w-full bg-white shadow-sm z-50">
+    <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="text-2xl font-bold text-indigo-600">current: <span class="text-gray-800"><a href="https://spb.hh.ru/employer/77364#it" class="hover:underline">PetrovichTech</a></span></div>
+        <nav id="mainNav" class="hidden md:flex space-x-8">
+            <a href="#home" class="text-indigo-600 font-medium">Home</a>
+            <a href="#about" class="hover:text-indigo-600 transition">About</a>
+            <a href="#experience" class="hover:text-indigo-600 transition">Experience</a>
+            <a href="#projects" class="hover:text-indigo-600 transition">Projects</a>
+            <a href="#contact" class="hover:text-indigo-600 transition">Contact</a>
+        </nav>
+        <button id="menuBtn" class="md:hidden focus:outline-none">
+            <i class="fas fa-bars text-2xl text-gray-600"></i>
+        </button>
+    </div>
+</header>
+
+<!-- Hero -->
+<section id="home" class="gradient-bg text-white pt-32 pb-20" data-aos="fade-up">
+    <div class="container mx-auto px-6 flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2 mb-12 md:mb-0 z-10">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Hi, I'm <span class="text-yellow-300">Igor Efremov</span></h1>
+            <h2 class="text-2xl md:text-3xl font-semibold mb-6">Senior Software Developer</h2>
+            <p class="text-lg mb-8 opacity-90">Senior backend developer with 12+ years of experience...</p>
+            <div class="flex space-x-4">
+                <a href="#contact" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition">Hire Me</a>
+                <a href="#projects" class="border-2 border-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:bg-opacity-10 transition">View Work</a>
+            </div>
+        </div>
+        <div class="md:w-1/2 flex justify-center">
+            <div class="relative w-64 h-64 md:w-80 md:h-80">
+                <div class="absolute inset-0 bg-white bg-opacity-20 rounded-full filter blur-xl"></div>
+                <img loading="lazy" src="static/silva.jpg" alt="Developer" class="relative w-full h-full object-cover rounded-full border-4 border-white floating">
+            </div>
+        </div>
+    </div>
+</section>
+<!-- About Section -->
+<section id="about" class="py-20 bg-white" data-aos="fade-up">
+    <div class="container mx-auto px-6">
+        <h2 class="text-3xl font-bold text-center mb-4">About Me</h2>
+        <div class="w-20 h-1 bg-indigo-600 mx-auto mb-12"></div>
+        <div class="flex flex-col md:flex-row items-center">
+            <!-- Фото -->
+            <div class="md:w-1/3 flex justify-center">
+                <div class="relative group">
+                    <img loading="lazy" src="static/photo.jpg"
+                         alt="Profile"
+                         class="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 object-cover rounded-2xl shadow-2xl transform transition duration-500 group-hover:scale-105">
+                    <div class="absolute inset-0 rounded-2xl ring-4 ring-indigo-500/20"></div>
+                </div>
+            </div>
+            <div class="md:w-2/3 md:pl-12 z-10">
+                <h3 class="text-2xl font-semibold mb-4">Who am I?</h3>
+                <p class="text-gray-700 mb-4 leading-relaxed">
+                    Worked on <strong class="text-indigo-600">architecture, migration, and scaling</strong> of systems, including the transition from <span class="font-semibold text-green-600">monoliths</span> to <span class="font-semibold text-green-600">microservices</span>. Main stack — <strong>PHP (7.2–8.2)</strong>, with some experience in <strong>Go</strong> through personal projects and small integrations into the stack.
+                </p>
+                <p class="text-gray-700 mb-4 leading-relaxed">
+                    Experienced in <strong>designing and optimizing databases</strong>, <strong>integrating external services</strong>, and building <strong>APIs according to OpenAPI</strong>. Familiar with <span class="text-indigo-600">Kafka, ElasticSearch, Redis, Docker</span>, and actively applying <strong>testing and CI/CD practices</strong>.
+                </p>
+                <p class="text-gray-700 mb-6 leading-relaxed">
+                    Focuses on <strong class="text-green-600">performance optimization</strong>, <strong>managing concurrent data access</strong>, and <strong>implementing metrics and monitoring</strong>. Able to work with <span class="text-indigo-600">legacy systems</span> as well as build <strong>architecture from scratch</strong>. Experienced in <strong>team collaboration, code reviews, and technical decision making</strong>.
+                </p>
+                <div class="mb-8 z-10">
+                    <h4 class="text-xl font-medium mb-4">My Skills</h4>
+                    <div class="flex flex-col md:flex-row gap-8">
+                        <div class="w-full md:w-1/2 space-y-4">
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span>PHP</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-indigo-600 h-2.5 rounded-full" style="width: 95%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span>MySQL</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-indigo-600 h-2.5 rounded-full" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span>Elastic Search</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-indigo-600 h-2.5 rounded-full" style="width: 80%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span>Docker</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-indigo-600 h-2.5 rounded-full" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span>Golang</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-indigo-600 h-2.5 rounded-full" style="width: 65%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-full md:w-1/2 space-y-4">
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span>PHPUnit & Testing</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-green-500 h-2.5 rounded-full" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span>Microservices</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-green-500 h-2.5 rounded-full" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span>Debian</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-green-500 h-2.5 rounded-full" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span>Frontend</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-green-500 h-2.5 rounded-full" style="width: 40%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span>ML</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-green-500 h-2.5 rounded-full" style="width: 20%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-4">
+                    <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
+                        <i class="fab fa-php text-blue-500 mr-2"></i>
+                        <span>PHP</span>
+                    </div>
+                    <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
+                        <i class="fas fa-database text-blue-400 mr-2"></i>
+                        <span>SQL</span>
+                    </div>
+                    <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
+                        <i class="fab fa-git-alt text-orange-500 mr-2"></i>
+                        <span>Git</span>
+                    </div>
+                    <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
+                        <i class="fab fa-golang text-blue-600 mr-2"></i>
+                        <span>Golang</span>
+                    </div>
+                    <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
+                        <i class="fab fa-docker text-blue-300 mr-2"></i>
+                        <span>Docker</span>
+                    </div>
+                    <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
+                        <i class="fas fa-server text-gray-600 mr-2"></i>
+                        <span>Debian</span>
+                    </div>
+                    <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
+                        <i class="fas fa-search text-yellow-600 mr-2"></i>
+                        <span>Elastic Search</span>
+                    </div>
+                    <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
+                        <i class="fas fa-stream text-purple-600 mr-2"></i>
+                        <span>Kafka</span>
+                    </div>
+                    <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
+                        <i class="fas fa-memory text-red-500 mr-2"></i>
+                        <span>Redis</span>
+                    </div>
+                    <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
+                        <i class="fas fa-brain text-pink-500 mr-2"></i>
+                        <span>ML</span>
+                    </div>
+                    <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
+                        <i class="fas fa-project-diagram text-indigo-500 mr-2"></i>
+                        <span>JIRA</span>
+                    </div>
+                    <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
+                        <i class="fas fa-sync-alt text-green-500 mr-2"></i>
+                        <span>Agile</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Experience -->
+<section id="experience" class="py-20 bg-gray-50" data-aos="fade-up">
+    <div class="container mx-auto px-6">
+        <h2 class="text-3xl font-bold text-center mb-4">Experience & Education</h2>
+        <div class="w-20 h-1 bg-indigo-600 mx-auto mb-12"></div>
+
+        <div class="flex flex-col md:flex-row">
+            <!-- Experience -->
+            <div class="md:w-1/2 md:pr-8 mb-12 md:mb-0">
+                <h3 class="text-2xl font-semibold mb-8 text-center md:text-left">
+                    <i class="fas fa-briefcase text-indigo-600 mr-2"></i> Work Experience
+                </h3>
+
+                <!-- ограничение высоты -->
+                <div class="relative pl-8 border-l-2 border-indigo-200 space-y-8 max-h-[500px] overflow-y-auto pr-4">
+                    <!-- Timeline item -->
+                    <div class="relative timeline-item">
+                        <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition ">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-lg">Senior Web Developer</h4>
+                                    <p class="text-indigo-600"><a href="https://petrovich.ru" class="hover:underline">Петрович Тех</a></p>
+                                </div>
+                                <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm self-start md:self-auto whitespace-nowrap">
+                                    <span class="block md:hidden">2022–Now</span>
+                                    <span class="hidden md:block">2022 - Now</span>
+                                </span>
+                            </div>
+                            <ul class="mt-2 text-gray-600 list-disc pl-5 space-y-1">
+                                <li>Organizing competitive data access</li>
+                                <li>Code optimization</li>
+                                <li>Migrating libraries and services to new PHP versions (7.2 → 8.2)</li>
+                                <li>Implementing PHPStan</li>
+                                <li>Migrating code to microservices</li>
+                                <li>Creating ElasticSearch indexes for data search</li>
+                                <li>API response validation according to OpenAPI specs</li>
+                                <li>Implementing global application metrics</li>
+                                <li>Working with Kafka events</li>
+                                <li>Developing proxy server for fixture responses in Golang</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Timeline item -->
+                    <div class="relative timeline-item">
+                        <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-lg">Senior Backend Engineer</h4>
+                                    <p class="text-indigo-600"><a href="https://www.alyce.com/" class="hover:underline">Alyce</a></p>
+                                </div>
+                                <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm self-start md:self-auto whitespace-nowrap">
+                                    <span class="block md:hidden">2020–2022</span>
+                                    <span class="hidden md:block">2020 - 2022</span>
+                                </span>
+                            </div>
+                            <ul class="mt-2 text-gray-600 list-disc pl-5 space-y-1">
+                                <li>Developing APIs with OpenAPI specifications</li>
+                                <li>Migrations, optimizations, and refactoring</li>
+                                <li>Integration tests on Kotlin</li>
+                                <li>Integrating external services</li>
+                                <li>Code reviews and technical solution discussions</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Timeline item -->
+                    <div class="relative timeline-item">
+                        <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-lg">Senior Developer</h4>
+                                    <p class="text-indigo-600"><a href="https://petrovich.ru" class="hover:underline">Петрович</a></p>
+                                </div>
+                                <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm self-start md:self-auto whitespace-nowrap">
+                                    <span class="block md:hidden">2017–2020</span>
+                                    <span class="hidden md:block">2017 - 2020</span>
+                                </span>
+                            </div>
+                            <ul class="mt-2 text-gray-600 list-disc pl-5 space-y-1">
+                                <li>Optimizing company services</li>
+                                <li>Working on application architecture</li>
+                                <li>Go prototypes (non-production)</li>
+                                <li>Developing core components from scratch (DI, CircuitBreaker, Serializer, etc.)</li>
+                                <li>External and internal integrations (payment systems, SOAP/JSON RPC)</li>
+                                <li>Monolith decomposition and library architecture</li>
+                                <li>Test coverage (Unit, Integration, API)</li>
+                                <li>Developing various APIs</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Timeline item -->
+                    <div class="relative timeline-item">
+                        <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-lg">Web Developer</h4>
+                                    <p class="text-indigo-600">Gardenmoto/12Соток</p>
+                                </div>
+                                <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm self-start md:self-auto whitespace-nowrap">
+                                    <span class="block md:hidden">2016–2017</span>
+                                    <span class="hidden md:block">2016 - 2017</span>
+                                </span>
+                            </div>
+                            <ul class="mt-2 text-gray-600 list-disc pl-5 space-y-1">
+                                <li>New feature development</li>
+                                <li>Database design and optimization</li>
+                                <li>Migrating all projects to Git</li>
+                                <li>Web server separation</li>
+                                <li>Server performance optimization</li>
+                                <li>Project separation</li>
+                                <li>Implementing Yandex.Metrica and Google Funnels</li>
+                                <li>API integrations (Kladr, Yandex Maps, DPD)</li>
+                                <li>Developing BI server adapter on Symfony 3.x</li>
+                                <li>Working with Docker, SCSS/SASS, Gulp</li>
+                                <li>1C web service integration</li>
+                                <li>Nginx configuration</li>
+                                <li>Redis caching system</li>
+                                <li>Bash deployment scripts</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Timeline item -->
+                    <div class="relative timeline-item">
+                        <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-lg">Programmer</h4>
+                                    <p class="text-indigo-600">Кальвера</p>
+                                </div>
+                                <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm self-start md:self-auto whitespace-nowrap">
+                                    <span class="block md:hidden">2015–2016</span>
+                                    <span class="hidden md:block">2015 - 2016</span>
+                                </span>
+                            </div>
+                            <ul class="mt-2 text-gray-600 list-disc pl-5 space-y-1">
+                                <li>API implementation</li>
+                                <li>Working in large Agile/Scrum team</li>
+                                <li>Implementing testing methodologies</li>
+                                <li>Writing automated tests at all levels</li>
+                                <li>Version control migration (Mercurial to Git)</li>
+                                <li>Docker experience</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Timeline item -->
+                    <div class="relative timeline-item">
+                        <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-lg">Web Developer</h4>
+                                    <p class="text-indigo-600"><a href="https://www.majordomo.ru/" class="hover:underline">Majordomo</a></p>
+                                </div>
+                                <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm self-start md:self-auto whitespace-nowrap">
+                                    <span class="block md:hidden">2012–2015</span>
+                                    <span class="hidden md:block">2012 - 2015</span>
+                                </span>
+                            </div>
+                            <ul class="mt-2 text-gray-600 list-disc pl-5 space-y-1">
+                                <li>Billing system maintenance</li>
+                                <li>Legacy project support and new development</li>
+                                <li>Payment system integrations (Yandex, PayPal)</li>
+                                <li>MVC development experience</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Education -->
+            <div class="md:w-1/2 md:pl-8">
+                <h3 class="text-2xl font-semibold mb-8 text-center md:text-left">
+                    <i class="fas fa-graduation-cap text-indigo-600 mr-2"></i> Education
+                </h3>
+
+                <div class="relative pl-8 border-l-2 border-indigo-200 space-y-8">
+                    <div class="relative timeline-item">
+                        <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-lg">Engineer</h4>
+                                    <p class="text-indigo-600">Northwestern State University</p>
+                                    <p class="mt-2 text-gray-600">Degree in Management and Computer Science</p>
+                                </div>
+                                <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm self-start md:self-auto whitespace-nowrap">
+                                    <span class="block md:hidden">2005–2011</span>
+                                    <span class="hidden md:block">2005 - 2011</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Projects Section -->
+<section id="projects" class="py-20 bg-white" data-aos="fade-up">
+    <div class="container mx-auto px-6">
+        <h2 class="text-3xl font-bold text-center mb-4">My Projects</h2>
+        <div class="w-20 h-1 bg-indigo-600 mx-auto mb-12"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" >
+            <!-- Project 1 - Лабиринт -->
+            <div class="project-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300 z-10">
+                <div class="h-48 overflow-hidden">
+                    <img loading="lazy" src="https://raw.githubusercontent.com/efremovigor/go-labyrinth/refs/heads/master/lab_demo1.gif" alt="Лабиринт" class="w-full h-full object-cover">
+                </div>
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-xl font-bold">
+                            <a href="https://github.com/efremovigor/go-labyrinth" class="text-indigo-600 hover:text-indigo-800">
+                                Maze
+                            </a>
+                        </h3>
+                        <div class="flex space-x-2">
+                            <a href="https://github.com/efremovigor/go-labyrinth" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:scale-110 hover:bg-indigo-600 hover:text-white transition transform">
+                                <i class="fab fa-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <ul class="text-gray-600 mb-4 list-disc pl-5 space-y-1">
+                        <li>Generates a unique new maze each time</li>
+                        <li>The passage of his bot is implemented</li>
+                        <li>Implemented control in Player vs Bot mode</li>
+                    </ul>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">golang</span>
+                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">game</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 2 - Бот-ассистент -->
+            <div class="project-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300 z-10">
+                <div class="h-48 overflow-hidden">
+                    <img loading="lazy" src="https://github.com/efremovigor/telegram-bot-golang/blob/master/demo.gif?raw=true" alt="Бот-ассистент" class="w-full h-full object-cover">
+                </div>
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-xl font-bold">
+                            <a href="https://github.com/efremovigor/telegram-bot-golang" class="text-indigo-600 hover:text-indigo-800">
+                                English Language Assistant Bot
+                            </a>
+                        </h3>
+                        <div class="flex space-x-2">
+                            <a href="https://github.com/efremovigor/telegram-bot-golang" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:scale-110 hover:bg-indigo-600 hover:text-white transition transform">
+                                <i class="fab fa-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-2">Telegram Bot is an assistant who tries to find a translation for you and analyze words and strings by getting information from third-party resources.:</p>
+                    <ul class="text-gray-600 mb-4 list-disc pl-5 space-y-1">
+                        <li><b>dictionary.cambridge.org</b></li>
+                        <li><b>multitran.com</b></li>
+                        <li><b>wooordhunt.ru</b></li>
+                    </ul>
+                    <p class="text-gray-600 mb-4">He is able to give information in different ways, pictures, audio messages. There is also a built-in database (mysql) where everything we were looking for is written and a cache (redis) of raw/semi-raw data is made of what we were already looking for.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">golang</span>
+                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">telegram</span>
+                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">mySQL</span>
+                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">redis</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 3 - Сетевая игра -->
+            <div class="project-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300 z-10">
+                <div class="h-48 overflow-hidden">
+                    <img loading="lazy" src="https://github.com/efremovigor/game/raw/master/network_demo.gif" alt="Сетевая игра" class="w-full h-full object-cover">
+                </div>
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-xl font-bold">
+                            <a href="https://github.com/efremovigor/game" class="text-indigo-600 hover:text-indigo-800">
+                                Online game on Go
+                            </a>
+                        </h3>
+                        <div class="flex space-x-2">
+                            <a href="https://github.com/efremovigor/game" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:scale-110 hover:bg-indigo-600 hover:text-white transition transform">
+                                <i class="fab fa-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Online game on Go, all calculations on the backend, supports the lobby. Movement is WASD, Attack is space. Aim with the mouse.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">golang</span>
+                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">online game</span>
+                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">multiplayer</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-12">
+            <a href="#" class="inline-block border-2 border-indigo-600 text-indigo-600 px-6 py-3 rounded-lg font-medium hover:bg-indigo-600 hover:text-white transition">View All Projects</a>
+        </div>
+    </div>
+</section>
+
+
+<!-- Contact Section -->
+<section id="contact" class="py-20 gradient-bg text-white" data-aos="fade-up">
+    <div class="container mx-auto px-6">
+        <h2 class="text-3xl font-bold text-center mb-4">Get In Touch</h2>
+        <div class="w-20 h-1 bg-yellow-300 mx-auto mb-12"></div>
+
+        <div class="flex flex-col md:flex-row">
+            <div class="md:w-1/2 mb-12 md:mb-0 md:pr-8 z-10">
+                <h3 class="text-2xl font-semibold mb-6">Contact Information</h3>
+                <p class="mb-8 opacity-90">Feel free to reach out to me for any questions or opportunities. I'm always open to discussing new projects, creative ideas or opportunities to be part of your vision.</p>
+
+                <div class="space-y-6">
+                    <div class="flex items-start">
+                        <div class="mr-4 mt-1 text-yellow-300">
+                            <i class="fas fa-map-marker-alt text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Location</h4>
+                            <p class="opacity-90">Saint-Petersburg, Russia</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="mr-4 mt-1 text-yellow-300">
+                            <i class="fas fa-envelope text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Email</h4>
+                            <p class="opacity-90">igor198811@gmail.com</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="mr-4 mt-1 text-yellow-300">
+                            <i class="fas fa-phone-alt text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Phone</h4>
+                            <p class="opacity-90">+7 (921) 740-6192</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 z-10">
+                    <h4 class="font-semibold mb-4">Follow Me</h4>
+                    <div class="flex space-x-4">
+                        <a href="https://vk.com/igore" class="vk w-10 h-10 rounded-full bg-white bg-opacity-10 flex items-center justify-center hover:bg-opacity-20 transition">
+                            <i class="fa-brands fa-vk"></i>
+                        </a>
+                        <a href="https://github.com/efremovigor" class="github w-10 h-10 rounded-full bg-white bg-opacity-10 flex items-center justify-center hover:bg-opacity-20 transition">
+                            <i class="fa-brands fa-github"></i>
+                        </a>
+                        <a href="mailto:igor198811@gmail.com" class="gmail w-10 h-10 rounded-full bg-white bg-opacity-10 flex items-center justify-center hover:bg-opacity-20 transition">
+                            <i class="fa-brands fa-google"></i>
+                        </a>
+                        <a href="https://t.me/Igor198811" class="telegram w-10 h-10 rounded-full bg-white bg-opacity-10 flex items-center justify-center hover:bg-opacity-20 transition">
+                            <i class="fa-brands fa-telegram"></i>
+                        </a>
+                        <a href="https://www.instagram.com/igor.efremov.1988/" class="instagram w-10 h-10 rounded-full bg-white bg-opacity-10 flex items-center justify-center hover:bg-opacity-20 transition">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:w-1/2 md:pl-8 z-10">
+                <form id="contactForm" class="backdrop-blur-md bg-white/30 border border-white/20 shadow-xl rounded-2xl p-6">
+                    <div class="mb-6">
+                        <label for="name" class="block mb-2 font-medium">Your Name</label>
+                        <input type="text" id="name" class="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300">
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="email" class="block mb-2 font-medium">Your Email</label>
+                        <input type="email" id="email" class="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300">
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="subject" class="block mb-2 font-medium">Subject</label>
+                        <input type="text" id="subject" class="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300">
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="message" class="block mb-2 font-medium">Message</label>
+                        <textarea id="message" rows="5" class="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-yellow-300 text-indigo-800 px-6 py-3 rounded-lg font-bold hover:bg-yellow-400 transition">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-white py-12">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-6 md:mb-0 z-10">
+                <div class="text-2xl font-bold text-indigo-400">current: <span class="text-white"><a href="https://spb.hh.ru/employer/77364#it" class="hover:underline">PetrovichTech</a></span></div>
+                <p class="mt-2 text-gray-400"></p>
+            </div>
+
+            <div class="flex flex-col items-center md:items-end z-10">
+                <div class="flex space-x-6 mb-4">
+                    <a href="https://vk.com/igore" class="vk text-gray-400 hover:text-white transition"><i class="fa-brands fa-vk"></i></a>
+                    <a href="https://github.com/efremovigor" class="github text-gray-400 hover:text-white transition"><i class="fa-brands fa-github"></i></a>
+                    <a href="mailto:igor198811@gmail.com" class="gmail text-gray-400 hover:text-white transition"><i class="fa-brands fa-google"></i></a>
+                    <a href="https://t.me/Igor198811" class="telegram text-gray-400 hover:text-white transition"><i class="fa-brands fa-telegram"></i></a>
+                    <a href="https://www.instagram.com/igor.efremov.1988/" class="instagram text-gray-400 hover:text-white transition"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+                <p class="text-gray-400 text-sm">© 2025 Igor Efremov. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 800, once: true });
+
+    // Mobile menu
+    const menuBtn = document.getElementById('menuBtn');
+    const nav = document.getElementById('mainNav');
+    menuBtn.addEventListener('click', () => {
+        nav.classList.toggle('hidden');
+        nav.classList.toggle('flex');
+        nav.classList.toggle('flex-col');
+        nav.classList.toggle('absolute');
+        nav.classList.toggle('top-16');
+        nav.classList.toggle('left-0');
+        nav.classList.toggle('right-0');
+        nav.classList.toggle('bg-white');
+        nav.classList.toggle('p-4');
+        nav.classList.toggle('shadow-md');
+        nav.classList.toggle('space-y-4');
+    });
+
+    // Fake send form
+    document.getElementById('contactForm').addEventListener('submit', e => {
+        e.preventDefault();
+        alert("in develop");
+        e.target.reset();
+    });
+</script>
+<style>
+    @keyframes spin-slow {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .animate-spin-slow {
+        animation: spin-slow 30s linear infinite;
+    }
+</style>
 </body>
 </html>
-{{end}}
