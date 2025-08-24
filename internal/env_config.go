@@ -15,8 +15,10 @@ type Config struct {
 }
 
 type Env struct {
-	Type   string
-	Domain string
+	Type           string
+	Domain         string
+	TelegramToken  string
+	TelegramChatId string
 }
 
 func (e Config) IsDev() bool {
@@ -53,8 +55,10 @@ func NewConfig() Config {
 
 	return Config{
 		Env: Env{
-			Domain: os.Getenv("DOMAIN"),
-			Type:   os.Getenv("ENV"),
+			Domain:         os.Getenv("DOMAIN"),
+			Type:           os.Getenv("ENV"),
+			TelegramToken:  os.Getenv("TELEGRAM_TOKEN"),
+			TelegramChatId: os.Getenv("TELEGRAM_CHAT_ID"),
 		},
 	}
 }

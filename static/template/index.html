@@ -747,11 +747,45 @@
         nav.classList.toggle('space-y-4');
     });
 
-    // Fake send form
-    document.getElementById('contactForm').addEventListener('submit', e => {
-        e.preventDefault();
-        alert("in develop");
-        e.target.reset();
+    document.getElementById('contactForm').addEventListener('submit', async e => {
+        e.preventDefault(); // отменяем стандартную отправку формы
+
+        // собираем данные из полей
+        const formData = {
+            name: document.getElementById('name').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            subject: document.getElementById('subject').value.trim(),
+            msg: document.getElementById('message').value.trim()
+        };
+
+        // простая валидация
+        if (!formData.name || !formData.email || !formData.subject || !formData.msg) {
+            alert("Пожалуйста, заполните все поля!");
+            return;
+        }
+
+        try {
+            const response = await fetch('/send', { // замените на свой адрес
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert("Сообщение отправлено!");
+                e.target.reset();
+            } else {
+                alert("Ошибка отправки: " + (result.error || response.statusText));
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert("Произошла ошибка при отправке формы");
+        }
     });
 </script>
 <style>

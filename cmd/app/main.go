@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"html/template"
 	"os"
 	"os/signal"
 	"syscall"
@@ -39,6 +40,7 @@ func run(ctx context.Context) (err error) {
 
 	logger := log.NewLogger(level, []log.Listener{log.NewConsoleListener()})
 	httpServer := server.NewServer(logger, &config)
+	httpServer.SetTemplate(template.Must(template.ParseFiles("static/template/index.html")))
 
 	err = httpServer.Run(ctx)
 	if err != nil {
