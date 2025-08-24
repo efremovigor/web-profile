@@ -42,34 +42,190 @@
         .floating {
             animation: float 6s ease-in-out infinite;
         }
-    </style>
-    <style>
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-        .animate-float {
-            animation: float 8s ease-in-out infinite;
+
+        /* Safari-friendly toast notification styles */
+        .toast-container {
+            position: fixed;
+            top: 100px;
+            right: 0;
+            left: 0;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
         }
 
-        @keyframes spin-slow {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        .animate-spin-slow {
-            animation: spin-slow 60s linear infinite;
+        .toast-notification {
+            display: block;
+            margin: 0 auto 10px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            background: white;
+            color: #1f2937;
+            max-width: 90%;
+            width: 400px;
+            position: relative;
+            opacity: 0;
+            transition: opacity 0.5s ease, margin-top 0.5s ease;
+            pointer-events: auto;
         }
 
-        @keyframes pulse-slow {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+        .toast-notification.show {
+            opacity: 1;
+            margin-top: 0;
         }
-        .animate-pulse-slow {
-            animation: pulse-slow 10s ease-in-out infinite;
+
+        .toast-content {
+            display: flex;
+            align-items: center;
         }
+
+        .toast-icon {
+            margin-right: 12px;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .toast-success .toast-icon {
+            color: #10b981;
+        }
+
+        .toast-error .toast-icon {
+            color: #ef4444;
+        }
+
+        .toast-text {
+            flex-grow: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .toast-message {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 18px;
+            margin-left: 12px;
+            flex-shrink: 0;
+            transition: color 0.2s;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toast-close:hover {
+            color: #4b5563;
+        }
+
+        .toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: #e5e7eb;
+            width: 100%;
+            border-radius: 0 0 12px 12px;
+            overflow: hidden;
+        }
+
+        .toast-progress-bar {
+            height: 100%;
+            width: 100%;
+            border-radius: 0 0 12px 12px;
+            transform-origin: left;
+            animation: progressBar 5s linear forwards;
+        }
+
+        .toast-success .toast-progress-bar {
+            background: #10b981;
+        }
+
+        .toast-error .toast-progress-bar {
+            background: #ef4444;
+        }
+
+        @keyframes progressBar {
+            0% { transform: scaleX(1); }
+            100% { transform: scaleX(0); }
+        }
+
+        /* Form validation styles */
+        .form-input.error {
+            border-color: #f87171;
+        }
+        .error-message {
+            color: #f87171;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        .form-input.error + .error-message {
+            display: block;
+        }
+
+        /* Safari-specific fixes */
+        _::-webkit-full-page-media, _:future, :root .toast-notification {
+            margin-top: -20px;
+        }
+
+        _::-webkit-full-page-media, _:future, :root .toast-notification.show {
+            margin-top: 0;
+        }
+
+        @media not all and (min-resolution:.001dpcm) {
+            @supports (-webkit-appearance:none) {
+                .toast-notification {
+                    -webkit-transform: translateZ(0);
+                    transform: translateZ(0);
+                }
+            }
+        }
+
+        #mobileMenu {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(-100%); /* Сдвиг влево по умолчанию */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 48%;
+            height: 100%;
+            background: white;
+            z-index: 60; /* Увеличим z-index выше фона и контента */
+            padding: 6px;
+        }
+
+        #mobileMenu.show {
+            transform: translateX(0); /* Показываем меню */
+        }
+
+        #overlay {
+            position: fixed;
+            inset: 0; /* Полный экран */
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 50; /* Ниже меню, но выше контента */
+            height: 100vh; /* Убедимся, что оверлей занимает весь экран */
+        }
+
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 relative">
+<!-- Toast notification container -->
+<div id="toastContainer" class="toast-container"></div>
+
 <div class="absolute inset-0 overflow-hidden">
     <div class="absolute top-[-100px] left-[10%] w-160 h-160 bg-indigo-400 rounded-full opacity-10 animate-float"></div>
     <div class="absolute top-[15%] left-[70%] w-20 h-20 bg-pink-500 rounded-full opacity-30 animate-pulse-slow"></div>
@@ -138,7 +294,6 @@
         <h2 class="text-gray-800 text-3xl font-bold text-center mb-4">About Me</h2>
         <div class="w-20 h-1 bg-indigo-600 mx-auto mb-12"></div>
         <div class="flex flex-col md:flex-row items-center">
-            <!-- Фото -->
             <div class="md:w-1/3 flex justify-center">
                 <div class="relative group">
                     <img loading="lazy" src="static/photo.jpg"
@@ -606,8 +761,6 @@
         </div>
     </div>
 </section>
-
-
 <!-- Contact Section -->
 <section id="contact" class="py-20 gradient-bg text-white" data-aos="fade-up">
     <div class="container mx-auto px-6">
@@ -724,7 +877,6 @@
         </div>
     </div>
 </footer>
-
 <!-- Scripts -->
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script>
@@ -747,6 +899,79 @@
         nav.classList.toggle('space-y-4');
     });
 
+    // Safari detection
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        const toastContainer = document.getElementById('toastContainer');
+        const toastId = 'toast-' + Date.now();
+
+        const toast = document.createElement('div');
+        toast.id = toastId;
+        toast.className = `toast-notification toast-${type}`;
+
+        const icon = type === 'success' ?
+            '<i class="fas fa-check-circle toast-icon"></i>' :
+            '<i class="fas fa-exclamation-circle toast-icon"></i>';
+
+        toast.innerHTML = `
+            <div class="toast-content">
+                ${icon}
+                <div class="toast-text">
+                    <div class="toast-title">${type === 'success' ? 'Success!' : 'Error!'}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="dismissToast('${toastId}')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="toast-progress">
+                <div class="toast-progress-bar"></div>
+            </div>
+        `;
+
+        toastContainer.appendChild(toast);
+
+        // Safari-specific adjustments
+        if (isSafari) {
+            toast.style.webkitTransform = 'translateZ(0)';
+        }
+
+        // Show toast with animation
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+
+        // Auto dismiss after 5 seconds
+        const autoDismiss = setTimeout(() => {
+            dismissToast(toastId);
+        }, 5000);
+
+        // Store timeout reference for manual dismissal
+        toast.timeoutId = autoDismiss;
+    }
+
+    function dismissToast(toastId) {
+        const toast = document.getElementById(toastId);
+        if (!toast) return;
+
+        // Clear auto-dismiss timeout if exists
+        if (toast.timeoutId) {
+            clearTimeout(toast.timeoutId);
+        }
+
+        toast.classList.remove('show');
+
+        // Remove from DOM after animation completes
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 500);
+    }
+
+    // Enhanced form submission handler
     document.getElementById('contactForm').addEventListener('submit', async e => {
         e.preventDefault(); // отменяем стандартную отправку формы
 
@@ -760,11 +985,19 @@
 
         // простая валидация
         if (!formData.name || !formData.email || !formData.subject || !formData.msg) {
-            alert("Пожалуйста, заполните все поля!");
+            showToast("Please fill in all fields!", "error");
+            return;
+        }
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            showToast("Please enter a valid email address!", "error");
             return;
         }
 
         try {
+            // Здесь будет реальный запрос к серверу
             const response = await fetch('/send', { // замените на свой адрес
                 method: 'POST',
                 headers: {
@@ -776,26 +1009,17 @@
             const result = await response.json();
 
             if (response.ok) {
-                alert("Сообщение отправлено!");
+                showToast("Your message has been sent successfully!", "success");
                 e.target.reset();
             } else {
-                alert("Ошибка отправки: " + (result.error || response.statusText));
+                showToast("Error: " + (result.error || response.statusText), "error");
             }
 
         } catch (err) {
             console.error(err);
-            alert("Произошла ошибка при отправке формы");
+            showToast("Network error. Please try again later.", "error");
         }
     });
 </script>
-<style>
-    @keyframes spin-slow {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-    .animate-spin-slow {
-        animation: spin-slow 30s linear infinite;
-    }
-</style>
 </body>
 </html>

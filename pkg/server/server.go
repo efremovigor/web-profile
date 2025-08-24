@@ -91,7 +91,7 @@ func (s *Server) runServer(server *http.Server, isHttps bool) func() error {
 		}
 	} else {
 		return func() error {
-			s.logger.Log(log.Info(fmt.Sprintf("listening https://%s", server.Addr), nil))
+			s.logger.Log(log.Info(fmt.Sprintf("listening http://%s", server.Addr), nil))
 			if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 				s.logger.Log(log.Exception(fmt.Sprintf("%s - error working server: %s", server.Addr, err), nil))
 				return err
