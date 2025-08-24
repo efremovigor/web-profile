@@ -159,7 +159,7 @@
                     Focuses on <strong class="text-green-600">performance optimization</strong>, <strong>managing concurrent data access</strong>, and <strong>implementing metrics and monitoring</strong>. Able to work with <span class="text-indigo-600">legacy systems</span> as well as build <strong>architecture from scratch</strong>. Experienced in <strong>team collaboration, code reviews, and technical decision making</strong>.
                 </p>
                 <div class="mb-8 z-10">
-                    <h4 class="text-xl font-medium mb-4">My Skills</h4>
+                    <h4 class="text-gray-800 text-xl font-medium mb-4">My Skills</h4>
                     <div class="flex flex-col md:flex-row gap-8">
                         <div class="w-full md:w-1/2 space-y-4">
                             <div>
@@ -747,11 +747,45 @@
         nav.classList.toggle('space-y-4');
     });
 
-    // Fake send form
-    document.getElementById('contactForm').addEventListener('submit', e => {
-        e.preventDefault();
-        alert("in develop");
-        e.target.reset();
+    document.getElementById('contactForm').addEventListener('submit', async e => {
+        e.preventDefault(); // отменяем стандартную отправку формы
+
+        // собираем данные из полей
+        const formData = {
+            name: document.getElementById('name').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            subject: document.getElementById('subject').value.trim(),
+            msg: document.getElementById('message').value.trim()
+        };
+
+        // простая валидация
+        if (!formData.name || !formData.email || !formData.subject || !formData.msg) {
+            alert("Пожалуйста, заполните все поля!");
+            return;
+        }
+
+        try {
+            const response = await fetch('/send', { // замените на свой адрес
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert("Сообщение отправлено!");
+                e.target.reset();
+            } else {
+                alert("Ошибка отправки: " + (result.error || response.statusText));
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert("Произошла ошибка при отправке формы");
+        }
     });
 </script>
 <style>
