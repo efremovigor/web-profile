@@ -1230,10 +1230,23 @@
         const desc = block.querySelector(".description");
 
         btn.addEventListener("click", (e) => {
-            // Только для маленьких экранов
             if (window.innerWidth < 640) {
                 e.preventDefault();
+                // Закрыть все остальные описания
+                document.querySelectorAll(".description").forEach(el => {
+                    if (el !== desc) el.classList.add("hidden");
+                });
+                // Переключить текущее
                 desc.classList.toggle("hidden");
+            }
+        });
+
+        // Клик вне блока закрывает описание
+        document.addEventListener("click", (e) => {
+            if (window.innerWidth < 640) {
+                if (!block.contains(e.target)) {
+                    desc.classList.add("hidden");
+                }
             }
         });
     });
