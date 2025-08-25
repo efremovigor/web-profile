@@ -13,7 +13,7 @@ echo ">>> Обновляем зависимости"
 go mod tidy
 
 echo ">>> Собираем приложение"
-go build -o "$APP_NAME" .
+go build -o "$APP_NAME" cmd/app/main.go
 
 # Останавливаем прошлый процесс, если есть
 if [[ -f "$PID_FILE" ]]; then
