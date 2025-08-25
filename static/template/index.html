@@ -265,8 +265,8 @@
             <h2 class="text-2xl md:text-3xl font-semibold mb-6"><span class="lang-en">Senior Software Developer</span><span class="lang-ru" style="display:none">Разработчик ПО</span></h2>
             <p class="text-lg mb-8 opacity-90"><span class="lang-en">Senior backend developer with 12+ years of experience</span><span class="lang-ru" style="display:none">Старший бекенд программист с 12+ годами опыта</span>...</p>
             <div class="flex space-x-4">
-                <a href="#contact" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition"><span class="lang-en">Hire Me</span><span class="lang-ru" style="display:none">Нанять меня</span></a>
-                <a href="#projects" class="border-2 border-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:bg-opacity-10 transition"><span class="lang-en">View Work</span><span class="lang-ru" style="display:none">Посмотреть работы</span></a>
+                <a href="#contact" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition"><span class="lang-en">Hire Me</span><span class="lang-ru" style="display:none">Нанять</span></a>
+                <a href="#projects" class="border-2 border-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:bg-opacity-10 transition"><span class="lang-en">View Work</span><span class="lang-ru" style="display:none">Работы</span></a>
             </div>
         </div>
         <div class="md:w-1/2 flex justify-center">
@@ -407,7 +407,7 @@
                 </div>
 
                 <div class="flex flex-wrap gap-4">
-                    <div class="relative group">
+                    <div class="relative group skill-block">
                         <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full text-gray-800 cursor-pointer">
                             <i class="fab fa-php text-blue-500 mr-2"></i>
                             <span>PHP</span>
@@ -924,7 +924,7 @@
 <!-- Contact Section -->
 <section id="contact" class="py-20 gradient-bg text-white" data-aos="fade-up">
     <div class="container mx-auto px-6">
-        <h2 class="text-3xl font-bold text-center mb-4"><span class="lang-en">Get In Touch</span><span class="lang-ru" style="display:none">Связь</span></h2>
+        <h2 class="text-3xl font-bold text-center mb-4"><span class="lang-en">Get In Touch</span><span class="lang-ru" style="display:none">Контакты</span></h2>
         <div class="w-20 h-1 bg-yellow-300 mx-auto mb-12"></div>
 
         <div class="flex flex-col md:flex-row">
@@ -1222,6 +1222,20 @@
         // Переключаем отображение текста
         document.querySelectorAll('.lang-en').forEach(el => el.style.display = lang === 'en' ? 'inline' : 'none');
         document.querySelectorAll('.lang-ru').forEach(el => el.style.display = lang === 'ru' ? 'inline' : 'none');
+    });
+
+    // Мобильный toggle по клику
+    document.querySelectorAll(".skill-block").forEach(block => {
+        const btn = block.querySelector(".toggle-description");
+        const desc = block.querySelector(".description");
+
+        btn.addEventListener("click", (e) => {
+            // Только для маленьких экранов
+            if (window.innerWidth < 640) {
+                e.preventDefault();
+                desc.classList.toggle("hidden");
+            }
+        });
     });
 </script>
 </body>
