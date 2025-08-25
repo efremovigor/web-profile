@@ -283,7 +283,18 @@
         <div class="md:w-1/2 flex justify-center">
             <div class="relative w-64 h-64 md:w-80 md:h-80">
                 <div class="absolute inset-0 bg-white bg-opacity-20 rounded-full filter blur-xl"></div>
-                <img loading="lazy" src="static/silva.jpg" alt="Developer" class="relative w-full h-full object-cover rounded-full border-4 border-white floating">
+
+                <!-- контейнер для слайдов -->
+                <div class="relative w-full h-full rounded-full overflow-hidden border-4 border-white floating">
+                    <img src="static/img/silva.jpg" alt="Developer"
+                         class="slideshow absolute inset-0 w-full h-full object-cover rounded-full opacity-100 transition-opacity duration-[2000ms] ease-in-out">
+                    <img src="static/img/nine.jpg" alt="Developer"
+                         class="slideshow absolute inset-0 w-full h-full object-cover rounded-full opacity-0 transition-opacity duration-[2000ms] ease-in-out">
+                    <img src="static/img/silva1.jpg" alt="Developer"
+                         class="slideshow absolute inset-0 w-full h-full object-cover rounded-full opacity-0 transition-opacity duration-[2000ms] ease-in-out">
+                    <img src="static/img/nine1.jpg" alt="Developer"
+                         class="slideshow absolute inset-0 w-full h-full object-cover rounded-full opacity-0 transition-opacity duration-[2000ms] ease-in-out">
+                </div>
             </div>
         </div>
     </div>
@@ -296,7 +307,7 @@
         <div class="flex flex-col md:flex-row items-center">
             <div class="md:w-1/3 flex justify-center">
                 <div class="relative group">
-                    <img loading="lazy" src="static/photo.jpg"
+                    <img loading="lazy" src="static/img/photo.jpg"
                          alt="Profile"
                          class="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 object-cover rounded-2xl shadow-2xl transform transition duration-500 group-hover:scale-105">
                     <div class="absolute inset-0 rounded-2xl ring-4 ring-indigo-500/20"></div>
@@ -1020,6 +1031,23 @@
             showToast("Network error. Please try again later.", "error");
         }
     });
+
+    const slides = document.querySelectorAll(".slideshow");
+    let current = 0;
+
+    setInterval(() => {
+        const next = (current + 1) % slides.length;
+
+        // текущий уходит плавно
+        slides[current].classList.remove("opacity-100");
+        slides[current].classList.add("opacity-0");
+
+        // следующий появляется плавно
+        slides[next].classList.remove("opacity-0");
+        slides[next].classList.add("opacity-100");
+
+        current = next;
+    }, 6000); // раз в 6 секунд
 </script>
 </body>
 </html>
