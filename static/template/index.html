@@ -228,13 +228,25 @@
 <!-- Header -->
 <header class="fixed w-full bg-white shadow-sm z-50">
     <div class="container mx-auto px-6 py-4 flex items-center justify-between">
-        <div class="text-2xl font-bold text-indigo-600">current: <span class="text-gray-800"><a href="https://spb.hh.ru/employer/77364#it" class="hover:underline">PetrovichTech</a></span></div>
+        <div class="text-2xl font-bold text-indigo-600"><span class="lang-en">current: </span><span class="lang-ru" style="display:none">текущее: </span><span class="text-gray-800"><a href="https://spb.hh.ru/employer/77364#it" class="hover:underline"><span class="lang-en">PetrovichTech</span><span class="lang-ru" style="display:none">ПетровичТех</span></a></span></div>
         <nav id="mainNav" class="hidden md:flex space-x-8">
-            <a href="#home" class="text-indigo-600 font-medium transition">Home</a>
-            <a href="#about" class="text-gray-800 hover:text-indigo-600 transition">About</a>
-            <a href="#experience" class="text-gray-800 hover:text-indigo-600 transition">Experience</a>
-            <a href="#projects" class="text-gray-800 hover:text-indigo-600 transition">Projects</a>
-            <a href="#contact" class="text-gray-800 hover:text-indigo-600 transition">Contact</a>
+            <!-- Switch для смены языка -->
+            <div class="flex items-center space-x-2">
+                <div id="langSwitch" class="relative w-20 h-10 bg-gray-300 rounded-full cursor-pointer flex items-center">
+                    <!-- Кнопка-ползунок -->
+                    <div id="langThumb" class="absolute top-1 left-1 w-8 h-8 bg-white rounded-full shadow transition-transform flex items-center justify-center">
+                        🇬🇧
+                    </div>
+                    <!-- Флаги по бокам -->
+                    <span class="absolute left-2 text-lg">🇬🇧</span>
+                    <span class="absolute right-2 text-lg">🇷🇺</span>
+                </div>
+            </div>
+            <a href="#home" class="text-indigo-600 font-medium transition"><span class="lang-en">Home</span><span class="lang-ru" style="display:none">Главная</span></a>
+            <a href="#about" class="text-gray-800 hover:text-indigo-600 transition"><span class="lang-en">About</span><span class="lang-ru" style="display:none">Обо мне</span></a>
+            <a href="#experience" class="text-gray-800 hover:text-indigo-600 transition"><span class="lang-en">Experience</span><span class="lang-ru" style="display:none">Опыт</span></a>
+            <a href="#projects" class="text-gray-800 hover:text-indigo-600 transition"><span class="lang-en">Projects</span><span class="lang-ru" style="display:none">Проекты</span></a>
+            <a href="#contact" class="text-gray-800 hover:text-indigo-600 transition"><span class="lang-en">Contact</span><span class="lang-ru" style="display:none">Контакты</span></a>
         </nav>
         <button id="menuBtn" class="md:hidden focus:outline-none">
             <i class="fas fa-bars text-2xl text-gray-600"></i>
@@ -246,12 +258,15 @@
 <section id="home" class="gradient-bg text-white pt-32 pb-20" data-aos="fade-up">
     <div class="container mx-auto px-6 flex flex-col md:flex-row items-center">
         <div class="md:w-1/2 mb-12 md:mb-0 z-10">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">Hi, I'm <span class="text-yellow-300">Igor Efremov</span></h1>
-            <h2 class="text-2xl md:text-3xl font-semibold mb-6">Senior Software Developer</h2>
-            <p class="text-lg mb-8 opacity-90">Senior backend developer with 12+ years of experience...</p>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                <span class="lang-en">Hi, I'm <span class="text-yellow-300">Igor Efremov</span></span>
+                <span class="lang-ru" style="display:none">Привет, Я <span class="text-yellow-300">Игорь Ефремов</span></span>
+            </h1>
+            <h2 class="text-2xl md:text-3xl font-semibold mb-6"><span class="lang-en">Senior Software Developer</span><span class="lang-ru" style="display:none">Разработчик ПО</span></h2>
+            <p class="text-lg mb-8 opacity-90"><span class="lang-en">Senior backend developer with 12+ years of experience</span><span class="lang-ru" style="display:none">Старший бекенд программист с 12+ годами опыта</span>...</p>
             <div class="flex space-x-4">
-                <a href="#contact" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition">Hire Me</a>
-                <a href="#projects" class="border-2 border-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:bg-opacity-10 transition">View Work</a>
+                <a href="#contact" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition"><span class="lang-en">Hire Me</span><span class="lang-ru" style="display:none">Нанять меня</span></a>
+                <a href="#projects" class="border-2 border-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:bg-opacity-10 transition"><span class="lang-en">View Work</span><span class="lang-ru" style="display:none">Посмотреть работы</span></a>
             </div>
         </div>
         <div class="md:w-1/2 flex justify-center">
@@ -276,7 +291,7 @@
 <!-- About Section -->
 <section id="about" class="py-20 bg-white" data-aos="fade-up">
     <div class="container mx-auto px-6">
-        <h2 class="text-gray-800 text-3xl font-bold text-center mb-4">About Me</h2>
+        <h2 class="text-gray-800 text-3xl font-bold text-center mb-4"><span class="lang-en">About Me</span><span class="lang-ru" style="display:none">Обо мне</span></h2>
         <div class="w-20 h-1 bg-indigo-600 mx-auto mb-12"></div>
         <div class="flex flex-col md:flex-row items-center">
             <div class="md:w-1/3 flex justify-center">
@@ -288,18 +303,21 @@
                 </div>
             </div>
             <div class="md:w-2/3 md:pl-12 z-10">
-                <h3 class="text-gray-800 text-2xl font-semibold mb-4">Who am I?</h3>
+                <h3 class="text-gray-800 text-2xl font-semibold mb-4"><span class="lang-en">Who am I?</span><span class="lang-ru" style="display:none">Кто я?</span></h3>
                 <p class="text-gray-700 mb-4 leading-relaxed">
-                    Worked on <strong class="text-indigo-600">architecture, migration, and scaling</strong> of systems, including the transition from <span class="font-semibold text-green-600">monoliths</span> to <span class="font-semibold text-green-600">microservices</span>. Main stack — <strong>PHP (7.2–8.2)</strong>, with some experience in <strong>Go</strong> through personal projects and small integrations into the stack.
+                    <span class="lang-en">Worked on <strong class="text-indigo-600">architecture, migration, and scaling</strong> of systems, including the transition from <span class="font-semibold text-green-600">monoliths</span> to <span class="font-semibold text-green-600">microservices</span>. Main stack — <strong>PHP (7.2–8.2)</strong>, with some experience in <strong>Go</strong> through personal projects and small integrations into the stack.</span>
+                    <span class="lang-ru" style="display:none">Работал над <strong class="text-indigo-600">архитектурой, миграцией и масштабированием</strong> систем, включая переход от <span class="font-semibold text-green-600">монолитов</span> к <span class="font-semibold text-green-600">микросервисам</span>. Основной стек — <strong>PHP (7.2–8.2)</strong>, с некоторым опытом работы с <strong>Go</strong> через личные проекты и небольшие интеграции в стек.</span>
                 </p>
                 <p class="text-gray-700 mb-4 leading-relaxed">
-                    Experienced in <strong>designing and optimizing databases</strong>, <strong>integrating external services</strong>, and building <strong>APIs according to OpenAPI</strong>. Familiar with <span class="text-indigo-600">Kafka, ElasticSearch, Redis, Docker</span>, and actively applying <strong>testing and CI/CD practices</strong>.
+                    <span class="lang-en">Experienced in <strong>designing and optimizing databases</strong>, <strong>integrating external services</strong>, and building <strong>APIs according to OpenAPI</strong>. Familiar with <span class="text-indigo-600">Kafka, ElasticSearch, Redis, Docker</span>, and actively applying <strong>testing and CI/CD practices</strong>.</span>
+                    <span class="lang-ru" style="display:none">Опыт в <strong>проектировании и оптимизации баз данных</strong>, <strong>интеграции внешних сервисов</strong> и создании <strong>API по стандарту OpenAPI</strong>. Знаком с <span class="text-indigo-600">Kafka, ElasticSearch, Redis, Docker</span> и активно применяю <strong>практики тестирования и CI/CD</strong>.</span>
                 </p>
                 <p class="text-gray-700 mb-6 leading-relaxed">
-                    Focuses on <strong class="text-green-600">performance optimization</strong>, <strong>managing concurrent data access</strong>, and <strong>implementing metrics and monitoring</strong>. Able to work with <span class="text-indigo-600">legacy systems</span> as well as build <strong>architecture from scratch</strong>. Experienced in <strong>team collaboration, code reviews, and technical decision making</strong>.
+                    <span class="lang-en">Focuses on <strong class="text-green-600">performance optimization</strong>, <strong>managing concurrent data access</strong>, and <strong>implementing metrics and monitoring</strong>. Able to work with <span class="text-indigo-600">legacy systems</span> as well as build <strong>architecture from scratch</strong>. Experienced in <strong>team collaboration, code reviews, and technical decision making</strong>.</span>
+                    <span class="lang-ru" style="display:none">Сфокусирован на <strong class="text-green-600">оптимизации производительности</strong>, <strong>управлении конкурентным доступом к данным</strong> и <strong>реализации метрик и мониторинга</strong>. Умеет работать с <span class="text-indigo-600">устаревшими системами</span>, а также строить <strong>архитектуру с нуля</strong>. Опыт в <strong>командном взаимодействии, код-ревью и принятии технических решений</strong>.</span>
                 </p>
                 <div class="mb-8 z-10">
-                    <h4 class="text-gray-800 text-xl font-medium mb-4">My Skills</h4>
+                    <h4 class="text-gray-800 text-xl font-medium mb-4"><span class="lang-en">My Skills</span><span class="lang-ru" style="display:none">Мои навыки</span></h4>
                     <div class="flex flex-col md:flex-row gap-8">
                         <div class="w-full md:w-1/2 space-y-4">
                             <div>
@@ -346,7 +364,7 @@
                         <div class="w-full md:w-1/2 space-y-4">
                             <div>
                                 <div class="flex justify-between mb-1 text-gray-800">
-                                    <span>PHPUnit & Testing</span>
+                                    <span>PHPUnit & <span class="lang-en">Testing</span><span class="lang-ru" style="display:none">Тестирование</span></span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2.5">
                                     <div class="bg-green-500 h-2.5 rounded-full" style="width: 85%"></div>
@@ -354,7 +372,7 @@
                             </div>
                             <div>
                                 <div class="flex justify-between mb-1 text-gray-800">
-                                    <span>Microservices</span>
+                                    <span><span class="lang-en">Microservices</span><span class="lang-ru" style="display:none">Микросервисы</span></span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2.5">
                                     <div class="bg-green-500 h-2.5 rounded-full" style="width: 75%"></div>
@@ -396,7 +414,8 @@
                         </div>
 
                         <div class="absolute top-full mt-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-4 text-sm text-gray-600 z-10">
-                            Worked with PHP from legacy <strong>4.x</strong> up to modern <strong>8.2</strong>, using frameworks like <strong>Zend</strong> and <strong>Symfony</strong>, but often coding in plain PHP. Built core libraries from scratch, including <strong>DI</strong>, <strong>Serializer</strong>, <strong>Validator</strong>, and <strong>Circuit Breaker</strong>. Experienced in splitting monoliths into microservices, writing various types of tests, and mocking dependencies.
+                            <span class="lang-en">Worked with PHP from legacy <strong>4.x</strong> up to modern <strong>8.2</strong>, using frameworks like <strong>Zend</strong> and <strong>Symfony</strong>, but often coding in plain PHP. Built core libraries from scratch, including <strong>DI</strong>, <strong>Serializer</strong>, <strong>Validator</strong>, and <strong>Circuit Breaker</strong>. Experienced in splitting monoliths into microservices, writing various types of tests, and mocking dependencies.</span>
+                            <span class="lang-ru" style="display:none">Работал с PHP от устаревших версий <strong>4.x</strong> до современных <strong>8.2</strong>, используя фреймворки, такие как <strong>Zend</strong> и <strong>Symfony</strong>, но часто писал код на чистом PHP. Создавал основные библиотеки с нуля, включая <strong>DI</strong>, <strong>Serializer</strong>, <strong>Validator</strong> и <strong>Circuit Breaker</strong>. Имеется опыт разделения монолитов на микросервисы, написания различных типов тестов и мокирования зависимостей.</span>
                         </div>
                     </div>
                     <div class="relative group">
@@ -406,7 +425,8 @@
                         </div>
 
                         <div class="absolute top-full mt-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-4 text-sm text-gray-600 z-10">
-                            Primarily worked with <strong>MySQL</strong>, handling concurrent data access, participating in data migrations, and using triggers and stored procedures. Have a general understanding of <strong>PostgreSQL</strong>, but usually managed to work without it.
+                            <span class="lang-en">Primarily worked with <strong>MySQL</strong>, handling concurrent data access, participating in data migrations, and using triggers and stored procedures. Have a general understanding of <strong>PostgreSQL</strong>, but usually managed to work without it.</span>
+                            <span class="lang-ru" style="display:none">В основном работал с <strong>MySQL</strong>, обеспечивая конкурентный доступ к данным, участвуя в миграциях данных и используя триггеры и хранимые процедуры. Имеется общее понимание <strong>PostgreSQL</strong>, но обычно обходился без него.</span>
                         </div>
                     </div>
                     <div class="relative group">
@@ -416,7 +436,8 @@
                         </div>
 
                         <div class="absolute top-full mt-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-4 text-sm text-gray-600 z-10">
-                            Use <strong>Git</strong> extensively for both work and personal projects. Had some experience with <strong>Mercurial</strong>—and it was painful.
+                            <span class="lang-en">Use <strong>Git</strong> extensively for both work and personal projects. Had some experience with <strong>Mercurial</strong>—and it was painful.</span>
+                            <span class="lang-ru" style="display:none">Широко использую <strong>Git</strong> как в работе, так и в личных проектах. Имеется небольшой опыт с <strong>Mercurial</strong> — и это было мучительно.</span>
                         </div>
                     </div>
                     <div class="relative group">
@@ -426,7 +447,8 @@
                         </div>
 
                         <div class="absolute top-full mt-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-4 text-sm text-gray-600 z-10">
-                            Very interested in <strong>Golang</strong>, though its use isn’t always easy to justify in production. Have built many prototypes for fun and practice. At work, gained experience integrating it into a complex stack and <strong>CI/CD</strong> pipeline, including using linters—this project also relies on <strong>Golang</strong>.
+                            <span class="lang-en">Very interested in <strong>Golang</strong>, though its use isn’t always easy to justify in production. Have built many prototypes for fun and practice. At work, gained experience integrating it into a complex stack and <strong>CI/CD</strong> pipeline, including using linters—this project also relies on <strong>Golang</strong>.</span>
+                            <span class="lang-ru" style="display:none">Очень интересуюсь <strong>Golang</strong>, хотя его использование не всегда легко оправдать в продакшне. Создавал множество прототипов ради практики и интереса. На работе приобрёл опыт интеграции его в сложный стек и <strong>CI/CD</strong> пайплайн, включая использование линтеров — этот проект также основан на <strong>Golang</strong>.</span>
                         </div>
                     </div>
                     <div class="relative group">
@@ -436,7 +458,8 @@
                         </div>
 
                         <div class="absolute top-full mt-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-4 text-sm text-gray-600 z-10">
-                            Use <strong>Docker</strong> in development and have a solid general understanding of how it works.
+                            <span class="lang-en">Use <strong>Docker</strong> in development and have a solid general understanding of how it works.</span>
+                            <span class="lang-ru" style="display:none">Использую <strong>Docker</strong> в разработке и имею хорошее общее понимание его работы.</span>
                         </div>
                     </div>
                     <div class="relative group">
@@ -446,7 +469,8 @@
                         </div>
 
                         <div class="absolute top-full mt-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-4 text-sm text-gray-600 z-10">
-                            Work exclusively on <strong>Debian and similar systems</strong>, and generally avoid Windows environments. Have solid user-level knowledge, can set up everything needed for development, and occasionally write simple <strong>Bash scripts</strong>.
+                            <span class="lang-en">Work exclusively on <strong>Debian and similar systems</strong>, and generally avoid Windows environments. Have solid user-level knowledge, can set up everything needed for development, and occasionally write simple <strong>Bash scripts</strong>.</span>
+                            <span class="lang-ru" style="display:none">Работаю исключительно на <strong>Debian и похожих системах</strong> и, как правило, избегаю среды Windows. Обладаю прочными пользовательскими знаниями, могу настроить всё необходимое для разработки и иногда пишу простые <strong>Bash-скрипты</strong>.</span>
                         </div>
                     </div>
                     <div class="relative group">
@@ -456,7 +480,8 @@
                         </div>
 
                         <div class="absolute top-full mt-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-4 text-sm text-gray-600 z-10">
-                            Used <strong>ElasticSearch</strong> as a search engine, set up indexes from scratch, managed reindexing, and wrote queries for searching.
+                            <span class="lang-en">Used <strong>ElasticSearch</strong> as a search engine, set up indexes from scratch, managed reindexing, and wrote queries for searching.</span>
+                            <span class="lang-ru" style="display:none">Использовал <strong>ElasticSearch</strong> в качестве поискового движка, настраивал индексы с нуля, управлял переиндексацией и писал запросы для поиска.</span>
                         </div>
                     </div>
                     <div class="relative group">
@@ -466,7 +491,8 @@
                         </div>
 
                         <div class="absolute top-full mt-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-4 text-sm text-gray-600 z-10">
-                            Worked with <strong>Kafka</strong> for event-driven processing
+                            <span class="lang-en">Worked with <strong>Kafka</strong> for event-driven processing.</span>
+                            <span class="lang-ru" style="display:none">Работал с <strong>Kafka</strong> для обработки событий в режиме event-driven.</span>
                         </div>
                     </div>
                     <div class="relative group">
@@ -476,7 +502,8 @@
                         </div>
 
                         <div class="absolute top-full mt-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-4 text-sm text-gray-600 z-10">
-                            Extensively worked with <strong>Redis</strong>, primarily as a key-value store to cache heavy data.
+                            <span class="lang-en">Extensively worked with <strong>Redis</strong>, primarily as a key-value store to cache heavy data.</span>
+                            <span class="lang-ru" style="display:none">Широко работал с <strong>Redis</strong>, в основном как с key-value хранилищем для кэширования больших объёмов данных.</span>
                         </div>
                     </div>
                     <div class="relative group">
@@ -486,7 +513,8 @@
                         </div>
 
                         <div class="absolute top-full mt-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-4 text-sm text-gray-600 z-10">
-                            Implemented image-based product search using the <strong>CLIP</strong> library with the <strong>ViT-L-14</strong> model, creating an <strong>MVP</strong> in <strong>Python</strong>. Also enjoy quick-and-dirty coding to rapidly prototype ideas.
+                            <span class="lang-en">Implemented image-based product search using the <strong>CLIP</strong> library with the <strong>ViT-L-14</strong> model, creating an <strong>MVP</strong> in <strong>Python</strong>. Also enjoy vibe coding to rapidly prototype ideas.</span>
+                            <span class="lang-ru" style="display:none">Реализовал поиск товаров по изображению с использованием библиотеки <strong>CLIP</strong> и модели <strong>ViT-L-14</strong>, создав <strong>MVP</strong> на <strong>Python</strong>. Также люблю генерировать код для быстрого прототипирования идей.</span>
                         </div>
                     </div>
                     <div class="relative group">
@@ -496,7 +524,8 @@
                         </div>
 
                         <div class="absolute top-full mt-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-4 text-sm text-gray-600 z-10">
-                            Regularly use <strong>Jira</strong> at work as a task management tool.
+                            <span class="lang-en">Regularly use <strong>Jira</strong> at work as a task management tool.</span>
+                            <span class="lang-ru" style="display:none">Регулярно использую <strong>Jira</strong> на работе в качестве инструмента управления задачами.</span>
                         </div>
                     </div>
                     <div class="relative group">
@@ -506,7 +535,8 @@
                         </div>
 
                         <div class="absolute top-full mt-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-4 text-sm text-gray-600 z-10">
-                            Worked in <strong>Agile</strong>  teams, planning and tracking tasks in sprints using a board.
+                            <span class="lang-en">Worked in <strong>Agile</strong>  teams, planning and tracking tasks in sprints using a board.</span>
+                            <span class="lang-ru" style="display:none">Работал в командах по методологии <strong>Agile</strong>, планируя и отслеживая задачи в спринтах с использованием доски.</span>
                         </div>
                     </div>
                 </div>
@@ -517,14 +547,14 @@
 <!-- Experience -->
 <section id="experience" class="py-20 bg-gray-50" data-aos="fade-up">
     <div class="container mx-auto px-6">
-        <h2 class="text-3xl font-bold text-center mb-4 text-gray-800">Experience & Education</h2>
+        <h2 class="text-3xl font-bold text-center mb-4 text-gray-800"><span class="lang-en">Experience & Education</span><span class="lang-ru" style="display:none">Опыт и Образование</span></h2>
         <div class="w-20 h-1 bg-indigo-600 mx-auto mb-12"></div>
 
         <div class="flex flex-col md:flex-row">
             <!-- Experience -->
             <div class="md:w-1/2 md:pr-8 mb-12 md:mb-0">
                 <h3 class="text-2xl font-semibold mb-8 text-center md:text-left text-gray-800">
-                    <i class="fas fa-briefcase text-indigo-600 mr-2"></i> Work Experience
+                    <i class="fas fa-briefcase text-indigo-600 mr-2"></i> <span class="lang-en">Work Experience</span><span class="lang-ru" style="display:none">Рабочий опыт</span>
                 </h3>
 
                 <!-- ограничение высоты -->
@@ -534,15 +564,15 @@
                         <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition ">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h4 class="font-bold text-lg text-gray-800">Senior Web Developer</h4>
+                                    <h4 class="font-bold text-lg text-gray-800"><span class="lang-en">Senior Web Developer</span><span class="lang-ru" style="display:none">Старший Веб Программист</span></h4>
                                     <p class="text-indigo-600"><a href="https://petrovich.ru" class="hover:underline">Петрович Тех</a></p>
                                 </div>
                                 <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm self-start md:self-auto whitespace-nowrap">
-                                    <span class="block md:hidden">2022–Now</span>
-                                    <span class="hidden md:block">2022 - Now</span>
+                                    <span class="block md:hidden">2022–<span class="lang-en">Now</span><span class="lang-ru" style="display:none">Сейчас</span></span>
+                                    <span class="hidden md:block">2022 - <span class="lang-en">Now</span><span class="lang-ru" style="display:none">Сейчас</span></span>
                                 </span>
                             </div>
-                            <ul class="mt-2 text-gray-600 list-disc pl-5 space-y-1">
+                            <ul class="lang-en mt-2 text-gray-600 list-disc pl-5 space-y-1">
                                 <li>Organizing competitive data access</li>
                                 <li>Code optimization</li>
                                 <li>Migrating libraries and services to new PHP versions (7.2 → 8.2)</li>
@@ -555,28 +585,17 @@
                                 <li>Developing proxy server for fixture responses in Golang</li>
                                 <li>Developing a proxy server for aggregating responses in Golang</li>
                             </ul>
-                        </div>
-                    </div>
-
-                    <!-- Timeline item -->
-                    <div class="relative timeline-item">
-                        <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h4 class="font-bold text-lg text-gray-800">Senior Backend Engineer</h4>
-                                    <p class="text-indigo-600"><a href="https://www.alyce.com/" class="hover:underline">Alyce</a></p>
-                                </div>
-                                <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm self-start md:self-auto whitespace-nowrap">
-                                    <span class="block md:hidden">2020–2022</span>
-                                    <span class="hidden md:block">2020 - 2022</span>
-                                </span>
-                            </div>
-                            <ul class="mt-2 text-gray-600 list-disc pl-5 space-y-1">
-                                <li>Developing APIs with OpenAPI specifications</li>
-                                <li>Migrations, optimizations, and refactoring</li>
-                                <li>Integration tests on Kotlin</li>
-                                <li>Integrating external services</li>
-                                <li>Code reviews and technical solution discussions</li>
+                            <ul class="lang-ru mt-2 text-gray-600 list-disc pl-5 space-y-1" style="display:none">
+                                <li>Организация конкурентного доступа к данным</li>
+                                <li>Оптимизация кода</li>
+                                <li>Миграция библиотек и сервисов на новые версии PHP (7.2 → 8.2)</li>
+                                <li>Внедрение PHPStan</li> <li>Миграция кода на микросервисы</li>
+                                <li>Создание индексов ElasticSearch для поиска данных</li>
+                                <li>Валидация ответов API согласно спецификациям OpenAPI</li>
+                                <li>Реализация глобальных метрик приложения</li>
+                                <li>Работа с событиями Kafka</li>
+                                <li>Разработка прокси-сервера для ответов фикстур на Golang</li>
+                                <li>Разработка прокси-сервера для агрегирования ответов на Golang</li>
                             </ul>
                         </div>
                     </div>
@@ -586,7 +605,37 @@
                         <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h4 class="font-bold text-lg text-gray-800">Senior Developer</h4>
+                                    <h4 class="font-bold text-lg text-gray-800"><span class="lang-en">Senior Backend Engineer</span><span class="lang-ru" style="display:none">Старший Бекенд Инженер</span></h4>
+                                    <p class="text-indigo-600"><a href="https://www.alyce.com/" class="hover:underline">Alyce</a></p>
+                                </div>
+                                <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm self-start md:self-auto whitespace-nowrap">
+                                    <span class="block md:hidden">2020–2022</span>
+                                    <span class="hidden md:block">2020 - 2022</span>
+                                </span>
+                            </div>
+                            <ul class="lang-en mt-2 text-gray-600 list-disc pl-5 space-y-1">
+                                <li>Developing APIs with OpenAPI specifications</li>
+                                <li>Migrations, optimizations, and refactoring</li>
+                                <li>Integration tests on Kotlin</li>
+                                <li>Integrating external services</li>
+                                <li>Code reviews and technical solution discussions</li>
+                            </ul>
+                            <ul class="lang-en mt-2 text-gray-600 list-disc pl-5 space-y-1" style="display:none">
+                                <li>Разработка API по спецификациям OpenAPI</li>
+                                <li>Миграции, оптимизация и рефакторинг</li>
+                                <li>Интеграционные тесты на Kotlin</li>
+                                <li>Интеграция внешних сервисов</li>
+                                <li>Код-ревью и обсуждение технических решений</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Timeline item -->
+                    <div class="relative timeline-item">
+                        <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-lg text-gray-800"><span class="lang-en">Senior Developer</span><span class="lang-ru" style="display:none">Старший Разработчик</span></h4>
                                     <p class="text-indigo-600"><a href="https://petrovich.ru" class="hover:underline">Петрович</a></p>
                                 </div>
                                 <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm self-start md:self-auto whitespace-nowrap">
@@ -594,7 +643,7 @@
                                     <span class="hidden md:block">2017 - 2020</span>
                                 </span>
                             </div>
-                            <ul class="mt-2 text-gray-600 list-disc pl-5 space-y-1">
+                            <ul class="lang-en mt-2 text-gray-600 list-disc pl-5 space-y-1">
                                 <li>Optimizing company services</li>
                                 <li>Working on application architecture</li>
                                 <li>Go prototypes (non-production)</li>
@@ -604,6 +653,16 @@
                                 <li>Test coverage (Unit, Integration, API)</li>
                                 <li>Developing various APIs</li>
                             </ul>
+                            <ul class="lang-ru mt-2 text-gray-600 list-disc pl-5 space-y-1" style="display:none">
+                                <li>Оптимизация сервисов компании</li>
+                                <li>Работа над архитектурой приложения</li>
+                                <li>Прототипы на Go (не для продакшна)</li>
+                                <li>Разработка ключевых компонентов с нуля (DI, CircuitBreaker, Serializer и др.)</li>
+                                <li>Внешние и внутренние интеграции (платёжные системы, SOAP/JSON RPC)</li>
+                                <li>Декомпозиция монолитов и архитектура библиотек</li>
+                                <li>Покрытие тестами (Unit, Integration, API)</li>
+                                <li>Разработка различных API</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -612,7 +671,7 @@
                         <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h4 class="font-bold text-lg text-gray-800">Web Developer</h4>
+                                    <h4 class="font-bold text-lg text-gray-800"><span class="lang-en">Web Developer</span><span class="lang-ru" style="display:none">Веб Разработчик</span></h4>
                                     <p class="text-indigo-600">Gardenmoto/12Соток</p>
                                 </div>
                                 <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm self-start md:self-auto whitespace-nowrap">
@@ -620,7 +679,7 @@
                                     <span class="hidden md:block">2016 - 2017</span>
                                 </span>
                             </div>
-                            <ul class="mt-2 text-gray-600 list-disc pl-5 space-y-1">
+                            <ul class="lang-en mt-2 text-gray-600 list-disc pl-5 space-y-1">
                                 <li>New feature development</li>
                                 <li>Database design and optimization</li>
                                 <li>Migrating all projects to Git</li>
@@ -636,29 +695,21 @@
                                 <li>Redis caching system</li>
                                 <li>Bash deployment scripts</li>
                             </ul>
-                        </div>
-                    </div>
-
-                    <!-- Timeline item -->
-                    <div class="relative timeline-item">
-                        <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h4 class="font-bold text-lg text-gray-800">Programmer</h4>
-                                    <p class="text-indigo-600">Кальвера</p>
-                                </div>
-                                <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm self-start md:self-auto whitespace-nowrap">
-                                    <span class="block md:hidden">2015–2016</span>
-                                    <span class="hidden md:block">2015 - 2016</span>
-                                </span>
-                            </div>
-                            <ul class="mt-2 text-gray-600 list-disc pl-5 space-y-1">
-                                <li>API implementation</li>
-                                <li>Working in large Agile/Scrum team</li>
-                                <li>Implementing testing methodologies</li>
-                                <li>Writing automated tests at all levels</li>
-                                <li>Version control migration (Mercurial to Git)</li>
-                                <li>Docker experience</li>
+                            <ul class="lang-ru mt-2 text-gray-600 list-disc pl-5 space-y-1" style="display:none">
+                                <li>Разработка новых функций</li>
+                                <li>Проектирование и оптимизация баз данных</li>
+                                <li>Миграция всех проектов на Git</li>
+                                <li>Разделение веб-сервера</li>
+                                <li>Оптимизация производительности сервера</li>
+                                <li>Разделение проектов</li>
+                                <li>Внедрение Яндекс.Метрики и воронок Google</li>
+                                <li>Интеграция API (КЛАДР, Яндекс.Карты, DPD)</li>
+                                <li>Разработка адаптера BI-сервера на Symfony 3.x</li>
+                                <li>Работа с Docker, SCSS/SASS, Gulp</li>
+                                <li>Интеграция с веб-сервисами 1С</li>
+                                <li>Настройка Nginx</li>
+                                <li>Кэширование через Redis</li>
+                                <li>Bash-скрипты для деплоя</li>
                             </ul>
                         </div>
                     </div>
@@ -668,7 +719,39 @@
                         <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h4 class="font-bold text-lg text-gray-800">Web Developer</h4>
+                                    <h4 class="font-bold text-lg text-gray-800"><span class="lang-en">Programmer</span><span class="lang-ru" style="display:none">Разработчик</span></h4>
+                                    <p class="text-indigo-600">Кальвера</p>
+                                </div>
+                                <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm self-start md:self-auto whitespace-nowrap">
+                                    <span class="block md:hidden">2015–2016</span>
+                                    <span class="hidden md:block">2015 - 2016</span>
+                                </span>
+                            </div>
+                            <ul class="lang-en mt-2 text-gray-600 list-disc pl-5 space-y-1">
+                                <li>API implementation</li>
+                                <li>Working in large Agile/Scrum team</li>
+                                <li>Implementing testing methodologies</li>
+                                <li>Writing automated tests at all levels</li>
+                                <li>Version control migration (Mercurial to Git)</li>
+                                <li>Docker experience</li>
+                            </ul>
+                            <ul class="lang-ru mt-2 text-gray-600 list-disc pl-5 space-y-1" style="display:none">
+                                <li>Реализация API</li>
+                                <li>Работа в большой команде по методологии Agile/Scrum</li>
+                                <li>Внедрение методологий тестирования</li>
+                                <li>Написание автоматизированных тестов на всех уровнях</li>
+                                <li>Миграция систем контроля версий (Mercurial → Git)</li>
+                                <li>Опыт работы с Docker</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Timeline item -->
+                    <div class="relative timeline-item">
+                        <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-lg text-gray-800"><span class="lang-en">Web Developer</span><span class="lang-ru" style="display:none">Веб Разработчик</span></h4>
                                     <p class="text-indigo-600"><a href="https://www.majordomo.ru/" class="hover:underline">Majordomo</a></p>
                                 </div>
                                 <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm self-start md:self-auto whitespace-nowrap">
@@ -676,11 +759,17 @@
                                     <span class="hidden md:block">2012 - 2015</span>
                                 </span>
                             </div>
-                            <ul class="mt-2 text-gray-600 list-disc pl-5 space-y-1">
+                            <ul class="lang-en mt-2 text-gray-600 list-disc pl-5 space-y-1">
                                 <li>Billing system maintenance</li>
                                 <li>Legacy project support and new development</li>
                                 <li>Payment system integrations (Yandex, PayPal)</li>
                                 <li>MVC development experience</li>
+                            </ul>
+                            <ul class="lang-ru mt-2 text-gray-600 list-disc pl-5 space-y-1" style="display:none">
+                                <li>Поддержка биллинговой системы</li>
+                                <li>Сопровождение устаревших проектов и разработка новых</li>
+                                <li>Интеграция платёжных систем (Яндекс, PayPal)</li>
+                                <li>Опыт разработки по MVC</li>
                             </ul>
                         </div>
                     </div>
@@ -689,7 +778,7 @@
             <!-- Education -->
             <div class="md:w-1/2 md:pl-8">
                 <h3 class="text-2xl font-semibold mb-8 text-center md:text-left text-gray-800">
-                    <i class="fas fa-graduation-cap text-indigo-600 mr-2 "></i> Education
+                    <i class="fas fa-graduation-cap text-indigo-600 mr-2 "></i> <span class="lang-en">Education</span><span class="lang-ru" style="display:none">Образование</span>
                 </h3>
 
                 <div class="relative pl-8 border-l-2 border-indigo-200 space-y-8">
@@ -697,9 +786,9 @@
                         <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h4 class="font-bold text-lg text-gray-800">Engineer</h4>
-                                    <p class="text-indigo-600">Northwestern State University</p>
-                                    <p class="mt-2 text-gray-600">Degree in Management and Computer Science</p>
+                                    <h4 class="font-bold text-lg text-gray-800"><span class="lang-en">Engineer</span><span class="lang-ru" style="display:none">Инженер</span></h4>
+                                    <p class="text-indigo-600"><span class="lang-en">Northwestern Technical University</span><span class="lang-ru" style="display:none">Северо-Западный Технический Университет</span></p>
+                                    <p class="mt-2 text-gray-600"><span class="lang-en">Automation and control in technical systems</span><span class="lang-ru" style="display:none">Автоматизация и управление в технических системах</span></p>
                                 </div>
                                 <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm self-start md:self-auto whitespace-nowrap">
                                     <span class="block md:hidden">2005–2011</span>
@@ -717,7 +806,7 @@
 <!-- Projects Section -->
 <section id="projects" class="py-20 bg-white" data-aos="fade-up">
     <div class="container mx-auto px-6">
-        <h2 class="text-3xl font-bold text-center mb-4 text-gray-800">My Projects</h2>
+        <h2 class="text-3xl font-bold text-center mb-4 text-gray-800"><span class="lang-en">My Projects</span><span class="lang-ru" style="display:none">Мои проекты</span></h2>
         <div class="w-20 h-1 bg-indigo-600 mx-auto mb-12"></div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" >
@@ -730,7 +819,7 @@
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="text-xl font-bold">
                             <a href="https://github.com/efremovigor/go-labyrinth" class="text-indigo-600 hover:text-indigo-800">
-                                Maze
+                                <span class="lang-en">Maze</span><span class="lang-ru" style="display:none">Лабиринт</span>
                             </a>
                         </h3>
                         <div class="flex space-x-2">
@@ -739,14 +828,19 @@
                             </a>
                         </div>
                     </div>
-                    <ul class="text-gray-600 mb-4 list-disc pl-5 space-y-1">
+                    <ul class="lang-en text-gray-600 mb-4 list-disc pl-5 space-y-1">
                         <li>Generates a unique new maze each time</li>
                         <li>The passage of his bot is implemented</li>
                         <li>Implemented control in Player vs Bot mode</li>
                     </ul>
+                    <ul class="lang-ru text-gray-600 mb-4 list-disc pl-5 space-y-1" style="display:none">
+                        <li>Генерирует уникальный новый лабиринт каждый раз</li>
+                        <li>Реализован проход его ботом</li>
+                        <li>Реализовано управление в режиме Игрок vs Бот</li>
+                    </ul>
                     <div class="flex flex-wrap gap-2">
                         <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">golang</span>
-                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">game</span>
+                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs"><span class="lang-en">game</span><span class="lang-ru" style="display:none">игра</span></span>
                     </div>
                 </div>
             </div>
@@ -760,7 +854,7 @@
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="text-xl font-bold">
                             <a href="https://github.com/efremovigor/telegram-bot-golang" class="text-indigo-600 hover:text-indigo-800">
-                                English Language Assistant Bot
+                                <span class="lang-en">English Language Assistant Bot</span><span class="lang-ru" style="display:none">Асистент помошник по изучению английского</span>
                             </a>
                         </h3>
                         <div class="flex space-x-2">
@@ -769,13 +863,19 @@
                             </a>
                         </div>
                     </div>
-                    <p class="text-gray-600 mb-2">Telegram Bot is an assistant who tries to find a translation for you and analyze words and strings by getting information from third-party resources.:</p>
+                    <p class="text-gray-600 mb-2">
+                        <span class="lang-en">Telegram Bot is an assistant who tries to find a translation for you and analyze words and strings by getting information from third-party resources.:</span>
+                        <span class="lang-ru" style="display:none">Telegram-бот — это помощник, который пытается найти перевод для вас и анализировать слова и строки, получая информацию из сторонних ресурсов.:</span>
+                    </p>
                     <ul class="text-gray-600 mb-4 list-disc pl-5 space-y-1">
                         <li><b>dictionary.cambridge.org</b></li>
                         <li><b>multitran.com</b></li>
                         <li><b>wooordhunt.ru</b></li>
                     </ul>
-                    <p class="text-gray-600 mb-4">He is able to give information in different ways, pictures, audio messages. There is also a built-in database (mysql) where everything we were looking for is written and a cache (redis) of raw/semi-raw data is made of what we were already looking for.</p>
+                    <p class="text-gray-600 mb-4">
+                        <span class="lang-en">He is able to give information in different ways, pictures, audio messages. There is also a built-in database (mysql) where everything we were looking for is written and a cache (redis) of raw/semi-raw data is made of what we were already looking for.</span>
+                        <span class="lang-ru" style="display:none">Он способен предоставлять информацию различными способами: картинками, аудиосообщениями. Также имеется встроенная база данных (MySQL), где записано всё, что мы искали, и кэш (Redis) с сырыми/полусырыми данными того, что уже было найдено.</span>
+                    </p>
                     <div class="flex flex-wrap gap-2">
                         <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">golang</span>
                         <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">telegram</span>
@@ -794,7 +894,7 @@
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="text-xl font-bold">
                             <a href="https://github.com/efremovigor/game" class="text-indigo-600 hover:text-indigo-800">
-                                Online game on Go
+                                <span class="lang-en">Online game on Go</span><span class="lang-ru" style="display:none">Онлайн игра на GO</span>
                             </a>
                         </h3>
                         <div class="flex space-x-2">
@@ -803,31 +903,37 @@
                             </a>
                         </div>
                     </div>
-                    <p class="text-gray-600 mb-4">Online game on Go, all calculations on the backend, supports the lobby. Movement is WASD, Attack is space. Aim with the mouse.</p>
+                    <p class="text-gray-600 mb-4">
+                        <span class="lang-en">Online game on Go, all calculations on the backend, supports the lobby. Movement is WASD, Attack is space. Aim with the mouse.</span>
+                        <span class="lang-ru" style="display:none">Онлайн-игра на Go, все вычисления происходят на сервере, поддерживается лобби. Движение — WASD, атака — пробел. Прицеливание мышью.</span>
+                    </p>
                     <div class="flex flex-wrap gap-2">
                         <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">golang</span>
-                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">online game</span>
-                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">multiplayer</span>
+                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs"><span class="lang-en">online game</span><span class="lang-ru" style="display:none">Онлайн игра</span></span>
+                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs"><span class="lang-en">multiplayer</span><span class="lang-ru" style="display:none">мультиплеер</span></span>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="text-center mt-12">
-            <a href="#" class="inline-block border-2 border-indigo-600 text-indigo-600 px-6 py-3 rounded-lg font-medium hover:bg-indigo-600 hover:text-white transition">View All Projects</a>
+            <a href="#" class="inline-block border-2 border-indigo-600 text-indigo-600 px-6 py-3 rounded-lg font-medium hover:bg-indigo-600 hover:text-white transition"><span class="lang-en">View All Projects</span><span class="lang-ru" style="display:none">Посмотреть все проекты</span></a>
         </div>
     </div>
 </section>
 <!-- Contact Section -->
 <section id="contact" class="py-20 gradient-bg text-white" data-aos="fade-up">
     <div class="container mx-auto px-6">
-        <h2 class="text-3xl font-bold text-center mb-4">Get In Touch</h2>
+        <h2 class="text-3xl font-bold text-center mb-4"><span class="lang-en">Get In Touch</span><span class="lang-ru" style="display:none">Связь</span></h2>
         <div class="w-20 h-1 bg-yellow-300 mx-auto mb-12"></div>
 
         <div class="flex flex-col md:flex-row">
             <div class="md:w-1/2 mb-12 md:mb-0 md:pr-8 z-10">
-                <h3 class="text-2xl font-semibold mb-6">Contact Information</h3>
-                <p class="mb-8 opacity-90">Feel free to reach out to me for any questions or opportunities. I'm always open to discussing new projects, creative ideas or opportunities to be part of your vision.</p>
+                <h3 class="text-2xl font-semibold mb-6"><span class="lang-en">Contact Information</span><span class="lang-ru" style="display:none">Контактная информация</span></h3>
+                <p class="mb-8 opacity-90">
+                    <span class="lang-en">Feel free to reach out to me for any questions or opportunities. I'm always open to discussing new projects, creative ideas or opportunities to be part of your vision.</span>
+                    <span class="lang-ru" style="display:none">Не стесняйтесь обращаться ко мне с любыми вопросами или предложениями. Я всегда открыт для обсуждения новых проектов, креативных идей или возможности стать частью вашей концепции.</span>
+                </p>
 
                 <div class="space-y-6">
                     <div class="flex items-start">
@@ -835,8 +941,8 @@
                             <i class="fas fa-map-marker-alt text-xl"></i>
                         </div>
                         <div>
-                            <h4 class="font-semibold">Location</h4>
-                            <p class="opacity-90">Saint-Petersburg, Russia</p>
+                            <h4 class="font-semibold"><span class="lang-en">Location</span><span class="lang-ru" style="display:none">Местоположение</span></h4>
+                            <p class="opacity-90"><span class="lang-en">Saint-Petersburg, Russia</span><span class="lang-ru" style="display:none">Санкт-Петербург, Россия</span></p>
                         </div>
                     </div>
 
@@ -845,7 +951,7 @@
                             <i class="fas fa-envelope text-xl"></i>
                         </div>
                         <div>
-                            <h4 class="font-semibold">Email</h4>
+                            <h4 class="font-semibold"><span class="lang-en">Email</span><span class="lang-ru" style="display:none">Почта</span></h4>
                             <p class="opacity-90">igor198811@gmail.com</p>
                         </div>
                     </div>
@@ -855,14 +961,14 @@
                             <i class="fas fa-phone-alt text-xl"></i>
                         </div>
                         <div>
-                            <h4 class="font-semibold">Phone</h4>
+                            <h4 class="font-semibold"><span class="lang-en">Phone</span><span class="lang-ru" style="display:none">Телефон</span></h4>
                             <p class="opacity-90">+7 (921) 740-6192</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-10 z-10">
-                    <h4 class="font-semibold mb-4">Follow Me</h4>
+                    <h4 class="font-semibold mb-4"><span class="lang-en">Follow Me</span><span class="lang-ru" style="display:none">Подписывайтесь на меня</span></h4>
                     <div class="flex space-x-4">
                         <a href="https://vk.com/igore" class="vk w-10 h-10 rounded-full bg-white bg-opacity-10 flex items-center justify-center hover:bg-opacity-20 transition">
                             <i class="fa-brands fa-vk"></i>
@@ -886,26 +992,26 @@
             <div class="md:w-1/2 md:pl-8 z-10">
                 <form id="contactForm" class="backdrop-blur-md bg-white/30 border border-white/20 shadow-xl rounded-2xl p-6">
                     <div class="mb-6">
-                        <label for="name" class="block mb-2 font-medium">Your Name</label>
+                        <label for="name" class="block mb-2 font-medium"><span class="lang-en">Your Name</span><span class="lang-ru" style="display:none">Ваше имя</span></label>
                         <input type="text" id="name" class="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300">
                     </div>
 
                     <div class="mb-6">
-                        <label for="email" class="block mb-2 font-medium">Your Email</label>
+                        <label for="email" class="block mb-2 font-medium"><span class="lang-en">Your Email</span><span class="lang-ru" style="display:none">Ваша почта</span></label>
                         <input type="email" id="email" class="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300">
                     </div>
 
                     <div class="mb-6">
-                        <label for="subject" class="block mb-2 font-medium">Subject</label>
+                        <label for="subject" class="block mb-2 font-medium"><span class="lang-en">Subject</span><span class="lang-ru" style="display:none">Тема</span></label>
                         <input type="text" id="subject" class="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300">
                     </div>
 
                     <div class="mb-6">
-                        <label for="message" class="block mb-2 font-medium">Message</label>
+                        <label for="message" class="block mb-2 font-medium"><span class="lang-en">Message</span><span class="lang-ru" style="display:none">Сообщение</span></label>
                         <textarea id="message" rows="5" class="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"></textarea>
                     </div>
 
-                    <button type="submit" class="w-full bg-yellow-300 text-indigo-800 px-6 py-3 rounded-lg font-bold hover:bg-yellow-400 transition">Send Message</button>
+                    <button type="submit" class="w-full bg-yellow-300 text-indigo-800 px-6 py-3 rounded-lg font-bold hover:bg-yellow-400 transition"><span class="lang-en">Send Message</span><span class="lang-ru" style="display:none">Ваше Сообщение</span></button>
                 </form>
             </div>
         </div>
@@ -917,7 +1023,7 @@
     <div class="container mx-auto px-6">
         <div class="flex flex-col md:flex-row justify-between items-center">
             <div class="mb-6 md:mb-0 z-10">
-                <div class="text-2xl font-bold text-indigo-400">current: <span class="text-white"><a href="https://spb.hh.ru/employer/77364#it" class="hover:underline">PetrovichTech</a></span></div>
+                <div class="text-2xl font-bold text-indigo-400"><span class="lang-en">current: </span><span class="lang-ru" style="display:none">текущее: </span><span class="text-white"><a href="https://spb.hh.ru/employer/77364#it" class="hover:underline"><span class="lang-en">PetrovichTech</span><span class="lang-ru" style="display:none">ПетровичТех</span></a></span></a></span></div>
                 <p class="mt-2 text-gray-400"></p>
             </div>
 
@@ -929,7 +1035,7 @@
                     <a href="https://t.me/Igor198811" class="telegram text-gray-400 hover:text-white transition"><i class="fa-brands fa-telegram"></i></a>
                     <a href="https://www.instagram.com/igor.efremov.1988/" class="instagram text-gray-400 hover:text-white transition"><i class="fa-brands fa-instagram"></i></a>
                 </div>
-                <p class="text-gray-400 text-sm">© 2025 Igor Efremov. All rights reserved.</p>
+                <p class="text-gray-400 text-sm">© 2025 <span class="lang-en">Igor Efremov. All rights reserved.</span><span class="lang-ru" style="display:none">Игорь Ефремов. Все права защищены</span></p>
             </div>
         </div>
     </div>
@@ -1094,6 +1200,29 @@
 
         current = next;
     }, 6000); // раз в 6 секунд
+
+    const switcher = document.getElementById('langSwitch');
+    const thumb = document.getElementById('langThumb');
+
+    let lang = 'en'; // по умолчанию EN
+
+    switcher.addEventListener('click', () => {
+        if (lang === 'en') {
+            // Переключаем на RU
+            thumb.style.transform = 'translateX(40px)';
+            thumb.textContent = '🇷🇺';
+            lang = 'ru';
+        } else {
+            // Переключаем на EN
+            thumb.style.transform = 'translateX(0px)';
+            thumb.textContent = '🇬🇧';
+            lang = 'en';
+        }
+
+        // Переключаем отображение текста
+        document.querySelectorAll('.lang-en').forEach(el => el.style.display = lang === 'en' ? 'inline' : 'none');
+        document.querySelectorAll('.lang-ru').forEach(el => el.style.display = lang === 'ru' ? 'inline' : 'none');
+    });
 </script>
 </body>
 </html>
