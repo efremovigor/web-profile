@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisualSearch — Поиск по изображению</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            background: #f9fafb;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header, footer {
+            background: #fff;
+            padding: 16px 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,.05);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        header p {
+            margin: 4px 0 0;
+            color: #555;
+        }
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .drop {
+            border: 2px dashed #ccc;
+            padding: 30px;
+            text-align: center;
+            border-radius: 12px;
+            background: #fff;
+            cursor: pointer;
+            max-width: 500px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        canvas {
+            display: none;
+            margin-top: 20px;
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,.1);
+        }
+        .btn {
+            margin: 10px;
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #3b82f6;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        section {
+            max-width: 700px;
+            text-align: center;
+            margin: 40px 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .controls {
+            display: none;
+            margin-top: 20px;
+        }
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1600px; /* Увеличил максимальную ширину */
+            justify-content: center;
+            transition: all 0.3s ease;
+            gap: 30px; /* Добавил отступ между редактором и результатами */
+        }
+        .editor-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+            max-width: 40%; /* Уменьшил ширину редактора */
+        }
+        .results-section {
+            flex: 1;
+            padding: 20px;
+            display: none;
+            width: 60%; /* Увеличил ширину секции результатов */
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Фиксировано 3 в ряд */
+            gap: 30px; /* Увеличил расстояние между карточками */
+            margin-top: 20px;
+        }
+        .product-card {
+            background: white;
+            border-radius: 16px; /* Увеличил скругление углов */
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15); /* Увеличил тень */
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            aspect-ratio: 1 / 1; /* Делаем карточку квадратной */
+            width: 100%; /* Занимает всю доступную ширину */
+            max-width: 320px; /* Максимальный размер карточки */
+            margin: 0 auto; /* Центрируем карточку */
+        }
+        .product-card:hover {
+            transform: translateY(-5px) scale(1.02); /* Убираем scale из обычного состояния */
+            box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+        }
+        .product-image-container {
+            width: 100%;
+            height: 315px; /* Фиксированная высота для изображения */
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f3f4f6;
+        }
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .product-info {
+            padding: 5px; /* Увеличил отступы */
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .product-title {
+            margin: 0 0 5px 0;
+            color: #1f2937;
+        }
+        .product-similarity {
+            color: #4b5563;
+            font-size: 1rem;
+            font-weight: 500;
+            display: inline-block;
+            width: fit-content;
+        }
+        .product-links {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: auto;
+        }
+        .product-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: 8px 0;
+            transition: color 0.2s;
+            font-weight: 500;
+        }
+        .product-link:hover {
+            text-decoration: underline;
+            color: #2563eb;
+        }
+        .search-title {
+            text-align: left;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        .search-meta {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .no-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 240px;
+            background-color: #f3f4f6;
+            color: #6b7280;
+            font-size: 1.1rem;
+            width: 100%;
+        }
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 1400px) {
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr); /* 2 в ряд на средних экранах */
+                gap: 25px;
+            }
+            .product-card {
+                max-width: 280px;
+            }
+        }
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .editor-section, .results-section {
+                max-width: 100%;
+                width: 100%;
+            }
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            .product-card {
+                max-width: 100%;
+            }
+        }
+        @media (max-width: 640px) {
+            .results-grid {
+                grid-template-columns: 1fr; /* 1 в ряд на мобильных */
+                gap: 20px;
+            }
+            .product-card {
+                max-width: 100%;
+                margin: 0;
+            }
+            .search-title {
+                font-size: 1.5rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>VisualSearch</h1>
+    <p>Загрузи картинку → выдели нужный фрагмент → найди похожие товары</p>
+</header>
+
+<main>
+    <div class="container" id="container">
+        <div class="editor-section" id="editorSection">
+            <section>
+                <h2>Попробуй демо</h2>
+                <div id="drop" class="drop">
+                    Перетащите картинку или кликните для выбора<br>
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                    <button onclick="fileInput.click()" class="btn">Выбрать файл</button>
+                </div>
+            </section>
+
+            <canvas id="editorCanvas"></canvas>
+            <div class="controls">
+                <button id="sendBtn" class="btn">Найти похожие товары</button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Ищем похожие товары...</p>
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <h2 class="search-title">Результаты поиска</h2>
+            <div class="search-meta" id="searchMeta" style="display: none;">
+                Найдено товаров: <span id="resultsCount">0</span> |
+                Время обработки: <span id="processingTime">0</span> сек.
+            </div>
+            <div class="results-grid" id="resultsGrid">
+                <!-- Товары будут добавлены здесь через JavaScript -->
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    © 2025 VisualSearch • Свяжись с нами: info@visualsearch.io
+</footer>
+
+<script>
+    const drop = document.getElementById('drop');
+    const fileInput = document.getElementById('fileInput');
+    const canvas = document.getElementById('editorCanvas');
+    const ctx = canvas.getContext('2d');
+    const sendBtn = document.getElementById('sendBtn');
+    const controls = document.querySelector('.controls');
+    const container = document.getElementById('container');
+    const editorSection = document.getElementById('editorSection');
+    const resultsSection = document.getElementById('resultsSection');
+    const resultsGrid = document.getElementById('resultsGrid');
+    const loading = document.getElementById('loading');
+    const searchMeta = document.getElementById('searchMeta');
+    const resultsCount = document.getElementById('resultsCount');
+    const processingTime = document.getElementById('processingTime');
+
+    // URL API endpoint (замените на ваш реальный endpoint)
+    const API_URL = '/image-search';
+
+    let img = null;
+    let sel = null;
+    let dragging = false;
+    let scale = 1;
+
+    drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.borderColor="#3b82f6"; });
+    drop.addEventListener('dragleave', () => drop.style.borderColor="#ccc");
+    drop.addEventListener('drop', e => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+
+    function handleFile(file){
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            img = new Image();
+            img.onload = () => {
+                const maxW = Math.min(window.innerWidth-40, 800);
+                const ratio = img.width/img.height;
+                let cw = maxW, ch = Math.round(cw/ratio);
+                if (ch > window.innerHeight*0.6){ ch = Math.round(window.innerHeight*0.6); cw = Math.round(ch*ratio);}
+                canvas.width = cw; canvas.height = ch;
+                scale = img.width/cw;
+                sel = null;
+
+                canvas.style.display = "block";
+                controls.style.display = "block";
+
+                redraw();
+            };
+            img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function redraw(){
+        if (!img) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        if (sel){
+            // Затемнение всего изображения
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // "Окно" выделения
+            ctx.save();
+            ctx.globalCompositeOperation = "destination-out";
+            ctx.fillStyle = "rgba(0,0,0,1)";
+            ctx.fillRect(sel.x, sel.y, sel.w, sel.h);
+            ctx.restore();
+
+            // Вернуть сам фрагмент сверху
+            ctx.drawImage(
+                img,
+                sel.x * scale, sel.y * scale, sel.w * scale, sel.h * scale,
+                sel.x, sel.y, sel.w, sel.h
+            );
+
+            // Рамка выделения
+            ctx.strokeStyle = "#3b82f6";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(sel.x, sel.y, sel.w, sel.h);
+        }
+    }
+
+    function getCanvasMousePos(event) {
+        // Получаем актуальные координаты canvas
+        const rect = canvas.getBoundingClientRect();
+
+        // Масштабируем координаты мыши под размер canvas
+        const x = (event.clientX - rect.left) * (canvas.width / rect.width);
+        const y = (event.clientY - rect.top) * (canvas.height / rect.height);
+
+        return { x, y };
+    }
+
+    canvas.addEventListener('mousedown', e => {
+        if (!img) return;
+
+        const pos = getCanvasMousePos(e);
+        dragging = true;
+
+        // Начинаем новое выделение
+        sel = {
+            x: pos.x,
+            y: pos.y,
+            w: 0,
+            h: 0
+        };
+
+        redraw();
+    });
+
+    canvas.addEventListener('mousemove', e => {
+        if (!img || !dragging || !sel) return;
+
+        const pos = getCanvasMousePos(e);
+
+        // Обновляем размер выделения
+        sel.w = pos.x - sel.x;
+        sel.h = pos.y - sel.y;
+
+        redraw();
+    });
+
+    canvas.addEventListener('mouseup', () => {
+        dragging = false;
+
+        // Корректируем координаты, если выделение делалось справа налево
+        if (sel && sel.w < 0) {
+            sel.x += sel.w;
+            sel.w = Math.abs(sel.w);
+        }
+        if (sel && sel.h < 0) {
+            sel.y += sel.h;
+            sel.h = Math.abs(sel.h);
+        }
+
+        redraw();
+    });
+
+    sendBtn.addEventListener('click', async () => {
+        // Определяем область для отправки
+        let sx, sy, sw, sh;
+
+        if (sel && sel.w >= 5 && sel.h >= 5) {
+            // Если есть выделенная область, используем её
+            sx = Math.round(sel.x * scale);
+            sy = Math.round(sel.y * scale);
+            sw = Math.round(sel.w * scale);
+            sh = Math.round(sel.h * scale);
+        } else {
+            // Если нет выделенной области, отправляем всё изображение
+            sx = 0;
+            sy = 0;
+            sw = img.width;
+            sh = img.height;
+        }
+
+        const out = document.createElement('canvas');
+        out.width = sw;
+        out.height = sh;
+        out.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+
+        try {
+            // Показываем индикатор загрузки
+            loading.style.display = "block";
+            sendBtn.disabled = true;
+
+            const blob = await new Promise(r => out.toBlob(r, "image/jpeg", 0.9));
+            const fd = new FormData();
+            fd.append("image", blob, "crop.jpg");
+            if (sel && sel.w >= 5 && sel.h >= 5) {
+                fd.append("coords", JSON.stringify({x: sx, y: sy, w: sw, h: sh}));
+            }
+
+            // Отправляем запрос на сервер
+            const response = await fetch(API_URL, {
+                method: "POST",
+                body: fd
+            });
+
+            if (!response.ok) {
+                throw new Error(`Ошибка сервера: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Показываем результаты
+                displayResults(data);
+            } else {
+                throw new Error("Не удалось выполнить поиск");
+            }
+
+        } catch (error) {
+            console.error("Ошибка:", error);
+            alert("Произошла ошибка при поиске товаров: " + error.message);
+
+            // Для демонстрации показываем mock-результаты при ошибке
+            displayMockResults();
+        } finally {
+            // Скрываем индикатор загрузки
+            loading.style.display = "none";
+            sendBtn.disabled = false;
+        }
+    });
+
+    function displayResults(data) {
+        // Очищаем предыдущие результаты
+        resultsGrid.innerHTML = '';
+
+        // Показываем мета-информацию
+        resultsCount.textContent = data.results.length;
+        processingTime.textContent = data.processing_time.total_seconds.toFixed(3);
+        searchMeta.style.display = 'block';
+
+        // Добавляем товары в сетку
+        data.results.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+
+            // Форматируем сходство в проценты
+            const similarityPercent = (product.similarity * 100).toFixed(1);
+
+            // Создаем элемент изображения с обработкой ошибок
+            let imageHtml;
+            if (product.image_url) {
+                imageHtml = `
+                    <div class="product-image-container">
+                        <img src="${product.image_url}" alt="Товар ${product.product_id}" class="product-image" onerror="handleImageError(this)">
+                    </div>
+                `;
+            } else {
+                imageHtml = `<div class="no-image">Изображение недоступно</div>`;
+            }
+
+            productCard.innerHTML = `
+                ${imageHtml}
+                <div class="product-info">
+                    <h3 class="product-title">Товар #${product.product_id}</h3>
+                    <div class="product-similarity">Сходство: ${similarityPercent}%</div>
+                    <div class="product-links">
+                        <a href="${product.product_url || '#'}" target="_blank" class="product-link">Страница товара</a>
+                        <a href="${product.category_url || '#'}" target="_blank" class="product-link">Категория</a>
+                    </div>
+                </div>
+            `;
+
+            resultsGrid.appendChild(productCard);
+        });
+
+        // Показываем результаты
+        container.style.flexDirection = "row";
+        editorSection.style.maxWidth = "40%";
+        resultsSection.style.display = "block";
+
+        // Прокручиваем к результатам
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Функция для обработки ошибок загрузки изображений
+    function handleImageError(img) {
+        const container = img.parentElement;
+        container.innerHTML = '<div class="no-image">Изображение не загружено</div>';
+    }
+
+    // Функция для демонстрации (если API недоступно)
+    function displayMockResults() {
+        // Mock данные в формате API
+        const mockData = {
+            "success": true,
+            "results": [
+                {
+                    "product_id": "143199",
+                    "category_id": "146041878",
+                    "similarity": 0.46929335594177246,
+                    "distance": 0.5307066440582275,
+                    "product_url": "https://petrovich.ru/product/143199/",
+                    "category_url": "https://petrovich.ru/catalog/146041878/",
+                    "has_csv_image": true,
+                    "image_url": "https://cs.petrovich.ru/image/26994759/original.jpg"
+                },
+                {
+                    "product_id": "148962",
+                    "category_id": "146041878",
+                    "similarity": 0.4410020709037781,
+                    "distance": 0.5589979290962219,
+                    "product_url": "https://petrovich.ru/product/148962/",
+                    "category_url": "https://petrovich.ru/catalog/146041878/",
+                    "has_csv_image": true,
+                    "image_url": "https://cs.petrovich.ru/image/105585/original.jpg"
+                },
+                {
+                    "product_id": "132633",
+                    "category_id": "146041878",
+                    "similarity": 0.43300533294677734,
+                    "distance": 0.5669946670532227,
+                    "product_url": "https://petrovich.ru/product/132633/",
+                    "category_url": "https://petrovich.ru/catalog/146041878/",
+                    "has_csv_image": true,
+                    "image_url": "https://cs.petrovich.ru/image/26993821/original.jpg"
+                }
+            ],
+            "processing_time": {
+                "embedding_seconds": 0.439,
+                "search_seconds": 0.017,
+                "total_seconds": 0.456
+            },
+            "device": "cpu",
+            "csv_loaded": true,
+            "total_images_in_csv": 60673
+        };
+
+        displayResults(mockData);
+    }
+</script>
+</body>
+</html>

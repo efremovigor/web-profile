@@ -2,6 +2,8 @@ package server
 
 import (
 	"context"
+	"encoding/binary"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -9,8 +11,10 @@ import (
 	"golang.org/x/sync/errgroup"
 	"html/template"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
+	"time"
 	"web_profile/internal"
 	"web_profile/pkg/log"
 )
@@ -122,9 +126,20 @@ func RedirectHandler(config *internal.Config) http.Handler {
 
 func (s *Server) setupRoutes(router *gin.Engine) {
 	// Пример маршрута
-	router.GET("/", ProfileHandler(s.template, s.logger))
+	router.GET("/", ProfilePage(s.template, s.logger))
+	router.GET("/image-search", ImageSearchPage(s.template, s.logger))
 	router.POST("/send", GetInTouchHandler(s.config, s.logger))
 	router.Static("/static", "./static") // статика, если понадобится
+	// Настройка Python сервера
+	pythonConfig := PythonServerConfig{
+		Host:    "localhost", // или IP вашего Python сервера
+		Port:    9999,
+		Timeout: 30 * time.Second,
+	}
+
+	// Добавление роутов
+	router.POST("/image-search", ImageSearchHandler(pythonConfig))
+	router.GET("/health/image-search", HealthCheckHandler(pythonConfig))
 }
 
 func CustomRecovery(l *log.Logger) gin.HandlerFunc {
@@ -151,13 +166,27 @@ func CustomRecovery(l *log.Logger) gin.HandlerFunc {
 	}
 }
 
-func ProfileHandler(tmpl *template.Template, logger *log.Logger) gin.HandlerFunc {
+func ProfilePage(tmpl *template.Template, logger *log.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Устанавливаем заголовок Content-Type
 		c.Header("Content-Type", "text/html; charset=utf-8")
 
 		// Выполняем шаблон и записываем результат в ResponseWriter
-		if err := tmpl.Execute(c.Writer, nil); err != nil {
+		if err := tmpl.ExecuteTemplate(c.Writer, "profile.html", nil); err != nil {
+			logger.Log(log.Exception(fmt.Sprintf("error rendering template: %s", err), nil))
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+	}
+}
+
+func ImageSearchPage(tmpl *template.Template, logger *log.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Устанавливаем заголовок Content-Type
+		c.Header("Content-Type", "text/html; charset=utf-8")
+
+		// Выполняем шаблон и записываем результат в ResponseWriter
+		if err := tmpl.ExecuteTemplate(c.Writer, "image_search.html", nil); err != nil {
 			logger.Log(log.Exception(fmt.Sprintf("error rendering template: %s", err), nil))
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
@@ -223,4 +252,254 @@ func sendToTelegram(config *internal.Config, name, email, subject, msg string) e
 	}
 
 	return nil
+}
+
+// SearchRequest структура запроса к Python серверу
+type SearchRequest struct {
+	TopK      int  `json:"top_k"`
+	ImageSize int  `json:"image_size"`
+	UseCache  bool `json:"use_cache"`
+}
+
+// SearchResult структура результата
+type SearchResult struct {
+	ProductID   string  `json:"product_id"`
+	CategoryID  string  `json:"category_id"`
+	Similarity  float64 `json:"similarity"`
+	Distance    float64 `json:"distance"`
+	ProductURL  string  `json:"product_url"`
+	CategoryURL string  `json:"category_url"`
+	ImageURL    string  `json:"image_url"`
+}
+
+// SearchResponse структура ответа от Python сервера
+type SearchResponse struct {
+	Success        bool           `json:"success"`
+	Results        []SearchResult `json:"results,omitempty"`
+	Error          string         `json:"error,omitempty"`
+	ProcessingTime struct {
+		EmbeddingSeconds float64 `json:"embedding_seconds"`
+		SearchSeconds    float64 `json:"search_seconds"`
+		TotalSeconds     float64 `json:"total_seconds"`
+	} `json:"processing_time,omitempty"`
+	Device string `json:"device,omitempty"`
+	Cached bool   `json:"cached,omitempty"`
+}
+
+// Config конфигурация Python сервера
+type PythonServerConfig struct {
+	Host    string
+	Port    int
+	Timeout time.Duration
+}
+
+// DefaultConfig дефолтная конфигурация
+var DefaultConfig = PythonServerConfig{
+	Host:    "localhost",
+	Port:    9999,
+	Timeout: 30 * time.Second,
+}
+
+// searchImage отправляет изображение на Python сервер и возвращает результат
+func searchImage(imageData []byte, topK int, useCache bool, config PythonServerConfig) (*SearchResponse, error) {
+	serverAddr := fmt.Sprintf("%s:%d", config.Host, config.Port)
+
+	// Установка соединения
+	conn, err := net.DialTimeout("tcp", serverAddr, config.Timeout)
+	if err != nil {
+		return nil, fmt.Errorf("connection to python server failed: %v", err)
+	}
+	defer conn.Close()
+
+	// Установка таймаута на операции
+	conn.SetDeadline(time.Now().Add(config.Timeout))
+
+	// Подготовка метаданных
+	request := SearchRequest{
+		TopK:      topK,
+		ImageSize: len(imageData),
+		UseCache:  useCache,
+	}
+
+	// Сериализация метаданных
+	metadataJSON, err := json.Marshal(request)
+	if err != nil {
+		return nil, fmt.Errorf("JSON marshaling failed: %v", err)
+	}
+
+	// Отправка заголовка (размер метаданных)
+	header := make([]byte, 4)
+	binary.BigEndian.PutUint32(header, uint32(len(metadataJSON)))
+	_, err = conn.Write(header)
+	if err != nil {
+		return nil, fmt.Errorf("header send failed: %v", err)
+	}
+
+	// Отправка метаданных
+	_, err = conn.Write(metadataJSON)
+	if err != nil {
+		return nil, fmt.Errorf("metadata send failed: %v", err)
+	}
+
+	// Отправка данных изображения
+	_, err = conn.Write(imageData)
+	if err != nil {
+		return nil, fmt.Errorf("image data send failed: %v", err)
+	}
+
+	// Получение ответа: заголовок
+	responseHeader := make([]byte, 4)
+	_, err = io.ReadFull(conn, responseHeader)
+	if err != nil {
+		return nil, fmt.Errorf("response header read failed: %v", err)
+	}
+
+	responseSize := binary.BigEndian.Uint32(responseHeader)
+
+	// Получение данных ответа
+	responseData := make([]byte, responseSize)
+	_, err = io.ReadFull(conn, responseData)
+	if err != nil {
+		return nil, fmt.Errorf("response data read failed: %v", err)
+	}
+
+	// Парсинг JSON ответа
+	var response SearchResponse
+	err = json.Unmarshal(responseData, &response)
+	if err != nil {
+		return nil, fmt.Errorf("JSON unmarshaling failed: %v", err)
+	}
+
+	return &response, nil
+}
+
+// ImageSearchRequest запрос от пользователя
+type ImageSearchRequest struct {
+	TopK    int  `form:"top_k" json:"top_k" binding:"min=1,max=100"`
+	NoCache bool `form:"no_cache" json:"no_cache"`
+}
+
+// ImageSearchHandler обработчик поиска по изображению
+func ImageSearchHandler(config PythonServerConfig) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		startTime := time.Now()
+
+		// Парсинг параметров запроса
+		//var requestParams ImageSearchRequest
+		//if err := c.ShouldBindQuery(&requestParams); err != nil {
+		//	c.JSON(http.StatusBadRequest, gin.H{
+		//		"success": false,
+		//		"error":   fmt.Sprintf("Invalid query parameters: %v", err),
+		//	})
+		//	return
+		//}
+
+		// Получение файла из запроса
+		file, err := c.FormFile("image")
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"error":   "Image file is required",
+			})
+			return
+		}
+
+		// Проверка размера файла (максимум 10MB)
+		if file.Size > 10*1024*1024 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"error":   "Image size exceeds 10MB limit",
+			})
+			return
+		}
+
+		// Проверка типа файла
+		allowedTypes := map[string]bool{
+			"image/jpeg": true,
+			"image/jpg":  true,
+			"image/png":  true,
+		}
+		if !allowedTypes[file.Header.Get("Content-Type")] {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"error":   "Unsupported image format. Supported: JPEG, PNG",
+			})
+			return
+		}
+
+		// Чтение файла
+		openedFile, err := file.Open()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"error":   fmt.Sprintf("Failed to open file: %v", err),
+			})
+			return
+		}
+		defer openedFile.Close()
+
+		imageData, err := io.ReadAll(openedFile)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"error":   fmt.Sprintf("Failed to read file: %v", err),
+			})
+			return
+		}
+
+		// Вызов Python сервера
+		response, err := searchImage(
+			imageData,
+			9,
+			false,
+			config,
+		)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success":     false,
+				"error":       fmt.Sprintf("Search failed: %v", err),
+				"proxy_error": true,
+			})
+			return
+		}
+
+		// Добавляем время проксирования
+		proxyTime := time.Since(startTime).Seconds()
+		if response.ProcessingTime.TotalSeconds > 0 {
+			response.ProcessingTime.TotalSeconds += proxyTime
+		}
+
+		// Возвращаем ответ от Python сервера
+		if response.Success {
+			c.JSON(http.StatusOK, response)
+		} else {
+			c.JSON(http.StatusInternalServerError, response)
+		}
+	}
+}
+
+// HealthCheckHandler проверка здоровья Python сервера
+func HealthCheckHandler(config PythonServerConfig) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		serverAddr := fmt.Sprintf("%s:%d", config.Host, config.Port)
+
+		conn, err := net.DialTimeout("tcp", serverAddr, 5*time.Second)
+		if err != nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"status":   "unhealthy",
+				"service":  "python_search",
+				"error":    err.Error(),
+				"endpoint": serverAddr,
+			})
+			return
+		}
+		defer conn.Close()
+
+		c.JSON(http.StatusOK, gin.H{
+			"status":   "healthy",
+			"service":  "python_search",
+			"endpoint": serverAddr,
+		})
+	}
 }
