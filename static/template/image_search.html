@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisualSearch — Поиск по изображению</title>
+    <style>
+        body { font-family: sans-serif; margin:0; background:#f9fafb; display:flex; flex-direction:column; min-height:100vh; }
+        header, footer { background:#fff; padding:16px 20px; box-shadow:0 2px 6px rgba(0,0,0,.05); }
+        header h1 { margin:0; font-size:1.5rem; }
+        header p { margin:4px 0 0; color:#555; }
+        main { flex:1; display:flex; flex-direction:column; align-items:center; padding:20px; }
+        .drop { border:2px dashed #ccc; padding:30px; text-align:center; border-radius:12px; background:#fff; cursor:pointer; max-width:500px; }
+        canvas { display:block; margin-top:20px; max-width:100%; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,.1); }
+        .btn { margin:10px; padding:10px 18px; border:0; border-radius:8px; background:#3b82f6; color:#fff; cursor:pointer; font-size:1rem; }
+        .btn:disabled { opacity:0.6; cursor:not-allowed; }
+        section { max-width:700px; text-align:center; margin:40px 0; }
+        footer { text-align:center; font-size:0.9rem; color:#666; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>VisualSearch</h1>
+    <p>Загрузи картинку → выдели нужный фрагмент → найди похожие товары</p>
+</header>
+
+<main>
+    <section>
+        <h2>Попробуй демо</h2>
+        <div id="drop" class="drop">
+            Перетащите картинку или кликните для выбора<br>
+            <input type="file" id="fileInput" accept="image/*" hidden>
+            <button onclick="fileInput.click()" class="btn">Выбрать файл</button>
+        </div>
+    </section>
+
+    <canvas id="editorCanvas"></canvas>
+    <div>
+        <button id="cropBtn" class="btn" style="display:none;">Обрезать (предпросмотр)</button>
+        <button id="sendBtn" class="btn" style="display:none;">Отправить на сервер</button>
+    </div>
+
+    <div id="previewBox" style="margin-top:20px; display:none;">
+        <h3>Предпросмотр:</h3>
+        <img id="cropPreview" style="max-width:250px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.2);" />
+    </div>
+</main>
+
+<footer>
+    © 2025 VisualSearch • Свяжись с нами: info@visualsearch.io
+</footer>
+
+<script>
+    const drop = document.getElementById('drop');
+    const fileInput = document.getElementById('fileInput');
+    const canvas = document.getElementById('editorCanvas');
+    const ctx = canvas.getContext('2d');
+    const cropBtn = document.getElementById('cropBtn');
+    const sendBtn = document.getElementById('sendBtn');
+    const previewBox = document.getElementById('previewBox');
+    const cropPreview = document.getElementById('cropPreview');
+
+    let img = null;
+    let sel = null;
+    let dragging = false, startX=0, startY=0;
+    let scale = 1;
+
+    drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.borderColor="#3b82f6"; });
+    drop.addEventListener('dragleave', () => drop.style.borderColor="#ccc");
+    drop.addEventListener('drop', e => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+
+    function handleFile(file){
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            img = new Image();
+            img.onload = () => {
+                const maxW = Math.min(window.innerWidth-40, 800);
+                const ratio = img.width/img.height;
+                let cw = maxW, ch = Math.round(cw/ratio);
+                if (ch > window.innerHeight*0.6){ ch = Math.round(window.innerHeight*0.6); cw = Math.round(ch*ratio);}
+                canvas.width = cw; canvas.height = ch;
+                scale = img.width/cw;
+                sel = null;
+                redraw();
+                cropBtn.style.display = sendBtn.style.display = "inline-block";
+            };
+            img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function redraw(){
+        if (!img) return;
+        ctx.drawImage(img, 0,0, canvas.width, canvas.height);
+        if (sel){
+            // затемнение всего
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+
+            // "окно" выделения
+            ctx.save();
+            ctx.globalCompositeOperation = "destination-out";
+            ctx.fillStyle = "rgba(0,0,0,1)";
+            ctx.fillRect(sel.x, sel.y, sel.w, sel.h);
+            ctx.restore();
+
+            // вернуть сам фрагмент сверху
+            ctx.drawImage(img,
+                sel.x*scale, sel.y*scale, sel.w*scale, sel.h*scale,
+                sel.x, sel.y, sel.w, sel.h
+            );
+        }
+    }
+
+    canvas.addEventListener('mousedown', e=>{
+        if (!img) return;
+        const r = canvas.getBoundingClientRect();
+        startX = e.clientX-r.left; startY = e.clientY-r.top;
+        dragging=true;
+    });
+    canvas.addEventListener('mousemove', e=>{
+        if (!img || !dragging) return;
+        const r = canvas.getBoundingClientRect();
+        const x = e.clientX-r.left, y=e.clientY-r.top;
+        sel = { x: Math.min(startX,x), y:Math.min(startY,y), w:Math.abs(x-startX), h:Math.abs(y-startY)};
+        redraw();
+    });
+    canvas.addEventListener('mouseup', ()=> dragging=false);
+
+    cropBtn.addEventListener('click', ()=>{
+        if (!sel || sel.w<5 || sel.h<5) return alert("Сначала выделите область");
+        const sx = Math.round(sel.x*scale);
+        const sy = Math.round(sel.y*scale);
+        const sw = Math.round(sel.w*scale);
+        const sh = Math.round(sel.h*scale);
+
+        const out = document.createElement('canvas');
+        out.width=sw; out.height=sh;
+        out.getContext('2d').drawImage(img, sx,sy,sw,sh, 0,0,sw,sh);
+
+        cropPreview.src = out.toDataURL();
+        previewBox.style.display="block";
+    });
+
+    sendBtn.addEventListener('click', async ()=>{
+        if (!sel) return;
+        const sx = Math.round(sel.x*scale);
+        const sy = Math.round(sel.y*scale);
+        const sw = Math.round(sel.w*scale);
+        const sh = Math.round(sel.h*scale);
+        const out = document.createElement('canvas');
+        out.width=sw; out.height=sh;
+        out.getContext('2d').drawImage(img, sx,sy,sw,sh,0,0,sw,sh);
+
+        const blob = await new Promise(r=>out.toBlob(r,"image/jpeg",0.9));
+        const fd = new FormData();
+        fd.append("image", blob, "crop.jpg");
+        fd.append("coords", JSON.stringify({x:sx,y:sy,w:sw,h:sh}));
+
+        const res = await fetch("/api/search",{method:"POST", body:fd});
+        console.log("Ответ сервера:", await res.text());
+        alert("Обрезанное изображение отправлено");
+    });
+</script>
+</body>
+</html>
