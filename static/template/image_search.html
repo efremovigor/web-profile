@@ -5,17 +5,141 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VisualSearch — Поиск по изображению</title>
     <style>
-        body { font-family: sans-serif; margin:0; background:#f9fafb; display:flex; flex-direction:column; min-height:100vh; }
-        header, footer { background:#fff; padding:16px 20px; box-shadow:0 2px 6px rgba(0,0,0,.05); }
-        header h1 { margin:0; font-size:1.5rem; }
-        header p { margin:4px 0 0; color:#555; }
-        main { flex:1; display:flex; flex-direction:column; align-items:center; padding:20px; }
-        .drop { border:2px dashed #ccc; padding:30px; text-align:center; border-radius:12px; background:#fff; cursor:pointer; max-width:500px; }
-        canvas { display:block; margin-top:20px; max-width:100%; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,.1); }
-        .btn { margin:10px; padding:10px 18px; border:0; border-radius:8px; background:#3b82f6; color:#fff; cursor:pointer; font-size:1rem; }
-        .btn:disabled { opacity:0.6; cursor:not-allowed; }
-        section { max-width:700px; text-align:center; margin:40px 0; }
-        footer { text-align:center; font-size:0.9rem; color:#666; }
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            background: #f9fafb;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header, footer {
+            background: #fff;
+            padding: 16px 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,.05);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        header p {
+            margin: 4px 0 0;
+            color: #555;
+        }
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .drop {
+            border: 2px dashed #ccc;
+            padding: 30px;
+            text-align: center;
+            border-radius: 12px;
+            background: #fff;
+            cursor: pointer;
+            max-width: 500px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        canvas {
+            display: none;
+            margin-top: 20px;
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,.1);
+        }
+        .btn {
+            margin: 10px;
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #3b82f6;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        section {
+            max-width: 700px;
+            text-align: center;
+            margin: 40px 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .controls {
+            display: none;
+            margin-top: 20px;
+        }
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .editor-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .results-section {
+            flex: 1;
+            padding: 20px;
+            display: none;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .product-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .product-info {
+            padding: 15px;
+        }
+        .product-title {
+            font-weight: 500;
+            margin: 0 0 10px 0;
+            font-size: 0.95rem;
+        }
+        .product-price {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        .search-title {
+            text-align: left;
+            margin-bottom: 20px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -25,24 +149,29 @@
 </header>
 
 <main>
-    <section>
-        <h2>Попробуй демо</h2>
-        <div id="drop" class="drop">
-            Перетащите картинку или кликните для выбора<br>
-            <input type="file" id="fileInput" accept="image/*" hidden>
-            <button onclick="fileInput.click()" class="btn">Выбрать файл</button>
+    <div class="container" id="container">
+        <div class="editor-section" id="editorSection">
+            <section>
+                <h2>Попробуй демо</h2>
+                <div id="drop" class="drop">
+                    Перетащите картинку или кликните для выбора<br>
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                    <button onclick="fileInput.click()" class="btn">Выбрать файл</button>
+                </div>
+            </section>
+
+            <canvas id="editorCanvas"></canvas>
+            <div class="controls">
+                <button id="sendBtn" class="btn">Найти похожие товары</button>
+            </div>
         </div>
-    </section>
 
-    <canvas id="editorCanvas"></canvas>
-    <div>
-        <button id="cropBtn" class="btn" style="display:none;">Обрезать (предпросмотр)</button>
-        <button id="sendBtn" class="btn" style="display:none;">Отправить на сервер</button>
-    </div>
-
-    <div id="previewBox" style="margin-top:20px; display:none;">
-        <h3>Предпросмотр:</h3>
-        <img id="cropPreview" style="max-width:250px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.2);" />
+        <div class="results-section" id="resultsSection">
+            <h2 class="search-title">Результаты поиска</h2>
+            <div class="results-grid" id="resultsGrid">
+                <!-- Товары будут добавлены здесь через JavaScript -->
+            </div>
+        </div>
     </div>
 </main>
 
@@ -55,14 +184,16 @@
     const fileInput = document.getElementById('fileInput');
     const canvas = document.getElementById('editorCanvas');
     const ctx = canvas.getContext('2d');
-    const cropBtn = document.getElementById('cropBtn');
     const sendBtn = document.getElementById('sendBtn');
-    const previewBox = document.getElementById('previewBox');
-    const cropPreview = document.getElementById('cropPreview');
+    const controls = document.querySelector('.controls');
+    const container = document.getElementById('container');
+    const editorSection = document.getElementById('editorSection');
+    const resultsSection = document.getElementById('resultsSection');
+    const resultsGrid = document.getElementById('resultsGrid');
 
     let img = null;
     let sel = null;
-    let dragging = false, startX=0, startY=0;
+    let dragging = false;
     let scale = 1;
 
     drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.borderColor="#3b82f6"; });
@@ -83,8 +214,11 @@
                 canvas.width = cw; canvas.height = ch;
                 scale = img.width/cw;
                 sel = null;
+
+                canvas.style.display = "block";
+                controls.style.display = "block";
+
                 redraw();
-                cropBtn.style.display = sendBtn.style.display = "inline-block";
             };
             img.src = reader.result;
         };
@@ -93,76 +227,208 @@
 
     function redraw(){
         if (!img) return;
-        ctx.drawImage(img, 0,0, canvas.width, canvas.height);
-        if (sel){
-            // затемнение всего
-            ctx.fillStyle = "rgba(0,0,0,0.5)";
-            ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-            // "окно" выделения
+        if (sel){
+            // Затемнение всего изображения
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // "Окно" выделения
             ctx.save();
             ctx.globalCompositeOperation = "destination-out";
             ctx.fillStyle = "rgba(0,0,0,1)";
             ctx.fillRect(sel.x, sel.y, sel.w, sel.h);
             ctx.restore();
 
-            // вернуть сам фрагмент сверху
-            ctx.drawImage(img,
-                sel.x*scale, sel.y*scale, sel.w*scale, sel.h*scale,
+            // Вернуть сам фрагмент сверху
+            ctx.drawImage(
+                img,
+                sel.x * scale, sel.y * scale, sel.w * scale, sel.h * scale,
                 sel.x, sel.y, sel.w, sel.h
             );
+
+            // Рамка выделения
+            ctx.strokeStyle = "#3b82f6";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(sel.x, sel.y, sel.w, sel.h);
         }
     }
 
-    canvas.addEventListener('mousedown', e=>{
+    function getCanvasMousePos(event) {
+        // Получаем актуальные координаты canvas
+        const rect = canvas.getBoundingClientRect();
+
+        // Масштабируем координаты мыши под размер canvas
+        const x = (event.clientX - rect.left) * (canvas.width / rect.width);
+        const y = (event.clientY - rect.top) * (canvas.height / rect.height);
+
+        return { x, y };
+    }
+
+    canvas.addEventListener('mousedown', e => {
         if (!img) return;
-        const r = canvas.getBoundingClientRect();
-        startX = e.clientX-r.left; startY = e.clientY-r.top;
-        dragging=true;
-    });
-    canvas.addEventListener('mousemove', e=>{
-        if (!img || !dragging) return;
-        const r = canvas.getBoundingClientRect();
-        const x = e.clientX-r.left, y=e.clientY-r.top;
-        sel = { x: Math.min(startX,x), y:Math.min(startY,y), w:Math.abs(x-startX), h:Math.abs(y-startY)};
+
+        const pos = getCanvasMousePos(e);
+        dragging = true;
+
+        // Начинаем новое выделение
+        sel = {
+            x: pos.x,
+            y: pos.y,
+            w: 0,
+            h: 0
+        };
+
         redraw();
     });
-    canvas.addEventListener('mouseup', ()=> dragging=false);
 
-    cropBtn.addEventListener('click', ()=>{
-        if (!sel || sel.w<5 || sel.h<5) return alert("Сначала выделите область");
-        const sx = Math.round(sel.x*scale);
-        const sy = Math.round(sel.y*scale);
-        const sw = Math.round(sel.w*scale);
-        const sh = Math.round(sel.h*scale);
+    canvas.addEventListener('mousemove', e => {
+        if (!img || !dragging || !sel) return;
 
-        const out = document.createElement('canvas');
-        out.width=sw; out.height=sh;
-        out.getContext('2d').drawImage(img, sx,sy,sw,sh, 0,0,sw,sh);
+        const pos = getCanvasMousePos(e);
 
-        cropPreview.src = out.toDataURL();
-        previewBox.style.display="block";
+        // Обновляем размер выделения
+        sel.w = pos.x - sel.x;
+        sel.h = pos.y - sel.y;
+
+        redraw();
     });
 
-    sendBtn.addEventListener('click', async ()=>{
-        if (!sel) return;
-        const sx = Math.round(sel.x*scale);
-        const sy = Math.round(sel.y*scale);
-        const sw = Math.round(sel.w*scale);
-        const sh = Math.round(sel.h*scale);
-        const out = document.createElement('canvas');
-        out.width=sw; out.height=sh;
-        out.getContext('2d').drawImage(img, sx,sy,sw,sh,0,0,sw,sh);
+    canvas.addEventListener('mouseup', () => {
+        dragging = false;
 
-        const blob = await new Promise(r=>out.toBlob(r,"image/jpeg",0.9));
+        // Корректируем координаты, если выделение делалось справа налево
+        if (sel && sel.w < 0) {
+            sel.x += sel.w;
+            sel.w = Math.abs(sel.w);
+        }
+        if (sel && sel.h < 0) {
+            sel.y += sel.h;
+            sel.h = Math.abs(sel.h);
+        }
+
+        redraw();
+    });
+
+    sendBtn.addEventListener('click', async () => {
+        // Определяем область для отправки
+        let sx, sy, sw, sh;
+
+        if (sel && sel.w >= 5 && sel.h >= 5) {
+            // Если есть выделенная область, используем её
+            sx = Math.round(sel.x * scale);
+            sy = Math.round(sel.y * scale);
+            sw = Math.round(sel.w * scale);
+            sh = Math.round(sel.h * scale);
+        } else {
+            // Если нет выделенной области, отправляем всё изображение
+            sx = 0;
+            sy = 0;
+            sw = img.width;
+            sh = img.height;
+        }
+
+        const out = document.createElement('canvas');
+        out.width = sw;
+        out.height = sh;
+        out.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+
+        const blob = await new Promise(r => out.toBlob(r, "image/jpeg", 0.9));
         const fd = new FormData();
         fd.append("image", blob, "crop.jpg");
-        fd.append("coords", JSON.stringify({x:sx,y:sy,w:sw,h:sh}));
+        fd.append("coords", JSON.stringify({x: sx, y: sy, w: sw, h: sh}));
 
-        const res = await fetch("/api/search",{method:"POST", body:fd});
-        console.log("Ответ сервера:", await res.text());
-        alert("Обрезанное изображение отправлено");
+        // Имитация отправки на сервер
+        console.log("Отправка данных на сервер...");
+
+        // Показываем индикатор загрузки
+        sendBtn.textContent = "Поиск...";
+        sendBtn.disabled = true;
+
+        // Имитация задержки поиска
+        setTimeout(() => {
+            // Смещаем редактор влево и показываем результаты
+            container.style.flexDirection = "row";
+            editorSection.style.maxWidth = "50%";
+            resultsSection.style.display = "block";
+
+            // Заполняем каталог товаров
+            displayMockResults();
+
+            // Восстанавливаем кнопку
+            sendBtn.textContent = "Найти похожие товары";
+            sendBtn.disabled = false;
+
+            console.log("Поиск завершен");
+        }, 1500);
     });
+
+    function displayMockResults() {
+        // Очищаем предыдущие результаты
+        resultsGrid.innerHTML = '';
+
+        // Mock-данные товаров
+        const mockProducts = [
+            {
+                name: "Стильные кроссовки",
+                price: "4 599 ₽",
+                image: "https://via.placeholder.com/300/3B82F6/FFFFFF?text=Кроссовки"
+            },
+            {
+                name: "Джинсы скинни",
+                price: "3 299 ₽",
+                image: "https://via.placeholder.com/300/10B981/FFFFFF?text=Джинсы"
+            },
+            {
+                name: "Кожаная куртка",
+                price: "8 999 ₽",
+                image: "https://via.placeholder.com/300/6366F1/FFFFFF?text=Куртка"
+            },
+            {
+                name: "Футболка с принтом",
+                price: "1 499 ₽",
+                image: "https://via.placeholder.com/300/EF4444/FFFFFF?text=Футболка"
+            },
+            {
+                name: "Спортивные шорты",
+                price: "2 199 ₽",
+                image: "https://via.placeholder.com/300/F59E0B/FFFFFF?text=Шорты"
+            },
+            {
+                name: "Элегантная сумка",
+                price: "5 799 ₽",
+                image: "https://via.placeholder.com/300/8B5CF6/FFFFFF?text=Сумка"
+            },
+            {
+                name: "Солнечные очки",
+                price: "2 899 ₽",
+                image: "https://via.placeholder.com/300/EC4899/FFFFFF?text=Очки"
+            },
+            {
+                name: "Кепка бейсболка",
+                price: "1 199 ₽",
+                image: "https://via.placeholder.com/300/14B8A6/FFFFFF?text=Кепка"
+            }
+        ];
+
+        // Добавляем товары в сетку
+        mockProducts.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+
+            productCard.innerHTML = `
+                <img src="${product.image}" alt="${product.name}" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">${product.name}</h3>
+                    <div class="product-price">${product.price}</div>
+                </div>
+            `;
+
+            resultsGrid.appendChild(productCard);
+        });
+    }
 </script>
 </body>
 </html>
