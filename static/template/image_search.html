@@ -86,9 +86,10 @@
         .container {
             display: flex;
             width: 100%;
-            max-width: 1200px;
+            max-width: 1600px; /* Увеличил максимальную ширину */
             justify-content: center;
             transition: all 0.3s ease;
+            gap: 30px; /* Добавил отступ между редактором и результатами */
         }
         .editor-section {
             flex: 1;
@@ -96,49 +97,168 @@
             flex-direction: column;
             align-items: center;
             transition: all 0.3s ease;
+            max-width: 40%; /* Уменьшил ширину редактора */
         }
         .results-section {
             flex: 1;
             padding: 20px;
             display: none;
+            width: 60%; /* Увеличил ширину секции результатов */
         }
         .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(3, 1fr); /* Фиксировано 3 в ряд */
+            gap: 30px; /* Увеличил расстояние между карточками */
             margin-top: 20px;
         }
         .product-card {
             background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            border-radius: 16px; /* Увеличил скругление углов */
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15); /* Увеличил тень */
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            aspect-ratio: 1 / 1; /* Делаем карточку квадратной */
+            width: 100%; /* Занимает всю доступную ширину */
+            max-width: 320px; /* Максимальный размер карточки */
+            margin: 0 auto; /* Центрируем карточку */
         }
         .product-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-5px) scale(1.02); /* Убираем scale из обычного состояния */
+            box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+        }
+        .product-image-container {
+            width: 100%;
+            height: 315px; /* Фиксированная высота для изображения */
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f3f4f6;
         }
         .product-image {
             width: 100%;
-            height: 180px;
+            height: 100%;
             object-fit: cover;
         }
         .product-info {
-            padding: 15px;
+            padding: 5px; /* Увеличил отступы */
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         .product-title {
-            font-weight: 500;
-            margin: 0 0 10px 0;
-            font-size: 0.95rem;
+            margin: 0 0 5px 0;
+            color: #1f2937;
         }
-        .product-price {
-            color: #2ecc71;
-            font-weight: bold;
+        .product-similarity {
+            color: #4b5563;
+            font-size: 1rem;
+            font-weight: 500;
+            display: inline-block;
+            width: fit-content;
+        }
+        .product-links {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: auto;
+        }
+        .product-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: 8px 0;
+            transition: color 0.2s;
+            font-weight: 500;
+        }
+        .product-link:hover {
+            text-decoration: underline;
+            color: #2563eb;
         }
         .search-title {
             text-align: left;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             color: #333;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        .search-meta {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .no-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 240px;
+            background-color: #f3f4f6;
+            color: #6b7280;
+            font-size: 1.1rem;
+            width: 100%;
+        }
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 1400px) {
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr); /* 2 в ряд на средних экранах */
+                gap: 25px;
+            }
+            .product-card {
+                max-width: 280px;
+            }
+        }
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .editor-section, .results-section {
+                max-width: 100%;
+                width: 100%;
+            }
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            .product-card {
+                max-width: 100%;
+            }
+        }
+        @media (max-width: 640px) {
+            .results-grid {
+                grid-template-columns: 1fr; /* 1 в ряд на мобильных */
+                gap: 20px;
+            }
+            .product-card {
+                max-width: 100%;
+                margin: 0;
+            }
+            .search-title {
+                font-size: 1.5rem;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -164,10 +284,19 @@
             <div class="controls">
                 <button id="sendBtn" class="btn">Найти похожие товары</button>
             </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Ищем похожие товары...</p>
+            </div>
         </div>
 
         <div class="results-section" id="resultsSection">
             <h2 class="search-title">Результаты поиска</h2>
+            <div class="search-meta" id="searchMeta" style="display: none;">
+                Найдено товаров: <span id="resultsCount">0</span> |
+                Время обработки: <span id="processingTime">0</span> сек.
+            </div>
             <div class="results-grid" id="resultsGrid">
                 <!-- Товары будут добавлены здесь через JavaScript -->
             </div>
@@ -190,6 +319,13 @@
     const editorSection = document.getElementById('editorSection');
     const resultsSection = document.getElementById('resultsSection');
     const resultsGrid = document.getElementById('resultsGrid');
+    const loading = document.getElementById('loading');
+    const searchMeta = document.getElementById('searchMeta');
+    const resultsCount = document.getElementById('resultsCount');
+    const processingTime = document.getElementById('processingTime');
+
+    // URL API endpoint (замените на ваш реальный endpoint)
+    const API_URL = '/image-search';
 
     let img = null;
     let sel = null;
@@ -335,99 +471,157 @@
         out.height = sh;
         out.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
 
-        const blob = await new Promise(r => out.toBlob(r, "image/jpeg", 0.9));
-        const fd = new FormData();
-        fd.append("image", blob, "crop.jpg");
-        fd.append("coords", JSON.stringify({x: sx, y: sy, w: sw, h: sh}));
+        try {
+            // Показываем индикатор загрузки
+            loading.style.display = "block";
+            sendBtn.disabled = true;
 
-        // Имитация отправки на сервер
-        console.log("Отправка данных на сервер...");
+            const blob = await new Promise(r => out.toBlob(r, "image/jpeg", 0.9));
+            const fd = new FormData();
+            fd.append("image", blob, "crop.jpg");
+            if (sel && sel.w >= 5 && sel.h >= 5) {
+                fd.append("coords", JSON.stringify({x: sx, y: sy, w: sw, h: sh}));
+            }
 
-        // Показываем индикатор загрузки
-        sendBtn.textContent = "Поиск...";
-        sendBtn.disabled = true;
+            // Отправляем запрос на сервер
+            const response = await fetch(API_URL, {
+                method: "POST",
+                body: fd
+            });
 
-        // Имитация задержки поиска
-        setTimeout(() => {
-            // Смещаем редактор влево и показываем результаты
-            container.style.flexDirection = "row";
-            editorSection.style.maxWidth = "50%";
-            resultsSection.style.display = "block";
+            if (!response.ok) {
+                throw new Error(`Ошибка сервера: ${response.status}`);
+            }
 
-            // Заполняем каталог товаров
+            const data = await response.json();
+
+            if (data.success) {
+                // Показываем результаты
+                displayResults(data);
+            } else {
+                throw new Error("Не удалось выполнить поиск");
+            }
+
+        } catch (error) {
+            console.error("Ошибка:", error);
+            alert("Произошла ошибка при поиске товаров: " + error.message);
+
+            // Для демонстрации показываем mock-результаты при ошибке
             displayMockResults();
-
-            // Восстанавливаем кнопку
-            sendBtn.textContent = "Найти похожие товары";
+        } finally {
+            // Скрываем индикатор загрузки
+            loading.style.display = "none";
             sendBtn.disabled = false;
-
-            console.log("Поиск завершен");
-        }, 1500);
+        }
     });
 
-    function displayMockResults() {
+    function displayResults(data) {
         // Очищаем предыдущие результаты
         resultsGrid.innerHTML = '';
 
-        // Mock-данные товаров
-        const mockProducts = [
-            {
-                name: "Стильные кроссовки",
-                price: "4 599 ₽",
-                image: "https://via.placeholder.com/300/3B82F6/FFFFFF?text=Кроссовки"
-            },
-            {
-                name: "Джинсы скинни",
-                price: "3 299 ₽",
-                image: "https://via.placeholder.com/300/10B981/FFFFFF?text=Джинсы"
-            },
-            {
-                name: "Кожаная куртка",
-                price: "8 999 ₽",
-                image: "https://via.placeholder.com/300/6366F1/FFFFFF?text=Куртка"
-            },
-            {
-                name: "Футболка с принтом",
-                price: "1 499 ₽",
-                image: "https://via.placeholder.com/300/EF4444/FFFFFF?text=Футболка"
-            },
-            {
-                name: "Спортивные шорты",
-                price: "2 199 ₽",
-                image: "https://via.placeholder.com/300/F59E0B/FFFFFF?text=Шорты"
-            },
-            {
-                name: "Элегантная сумка",
-                price: "5 799 ₽",
-                image: "https://via.placeholder.com/300/8B5CF6/FFFFFF?text=Сумка"
-            },
-            {
-                name: "Солнечные очки",
-                price: "2 899 ₽",
-                image: "https://via.placeholder.com/300/EC4899/FFFFFF?text=Очки"
-            },
-            {
-                name: "Кепка бейсболка",
-                price: "1 199 ₽",
-                image: "https://via.placeholder.com/300/14B8A6/FFFFFF?text=Кепка"
-            }
-        ];
+        // Показываем мета-информацию
+        resultsCount.textContent = data.results.length;
+        processingTime.textContent = data.processing_time.total_seconds.toFixed(3);
+        searchMeta.style.display = 'block';
 
         // Добавляем товары в сетку
-        mockProducts.forEach(product => {
+        data.results.forEach(product => {
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
 
+            // Форматируем сходство в проценты
+            const similarityPercent = (product.similarity * 100).toFixed(1);
+
+            // Создаем элемент изображения с обработкой ошибок
+            let imageHtml;
+            if (product.image_url) {
+                imageHtml = `
+                    <div class="product-image-container">
+                        <img src="${product.image_url}" alt="Товар ${product.product_id}" class="product-image" onerror="handleImageError(this)">
+                    </div>
+                `;
+            } else {
+                imageHtml = `<div class="no-image">Изображение недоступно</div>`;
+            }
+
             productCard.innerHTML = `
-                <img src="${product.image}" alt="${product.name}" class="product-image">
+                ${imageHtml}
                 <div class="product-info">
-                    <h3 class="product-title">${product.name}</h3>
-                    <div class="product-price">${product.price}</div>
+                    <h3 class="product-title">Товар #${product.product_id}</h3>
+                    <div class="product-similarity">Сходство: ${similarityPercent}%</div>
+                    <div class="product-links">
+                        <a href="${product.product_url || '#'}" target="_blank" class="product-link">Страница товара</a>
+                        <a href="${product.category_url || '#'}" target="_blank" class="product-link">Категория</a>
+                    </div>
                 </div>
             `;
 
             resultsGrid.appendChild(productCard);
         });
+
+        // Показываем результаты
+        container.style.flexDirection = "row";
+        editorSection.style.maxWidth = "40%";
+        resultsSection.style.display = "block";
+
+        // Прокручиваем к результатам
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Функция для обработки ошибок загрузки изображений
+    function handleImageError(img) {
+        const container = img.parentElement;
+        container.innerHTML = '<div class="no-image">Изображение не загружено</div>';
+    }
+
+    // Функция для демонстрации (если API недоступно)
+    function displayMockResults() {
+        // Mock данные в формате API
+        const mockData = {
+            "success": true,
+            "results": [
+                {
+                    "product_id": "143199",
+                    "category_id": "146041878",
+                    "similarity": 0.46929335594177246,
+                    "distance": 0.5307066440582275,
+                    "product_url": "https://petrovich.ru/product/143199/",
+                    "category_url": "https://petrovich.ru/catalog/146041878/",
+                    "has_csv_image": true,
+                    "image_url": "https://cs.petrovich.ru/image/26994759/original.jpg"
+                },
+                {
+                    "product_id": "148962",
+                    "category_id": "146041878",
+                    "similarity": 0.4410020709037781,
+                    "distance": 0.5589979290962219,
+                    "product_url": "https://petrovich.ru/product/148962/",
+                    "category_url": "https://petrovich.ru/catalog/146041878/",
+                    "has_csv_image": true,
+                    "image_url": "https://cs.petrovich.ru/image/105585/original.jpg"
+                },
+                {
+                    "product_id": "132633",
+                    "category_id": "146041878",
+                    "similarity": 0.43300533294677734,
+                    "distance": 0.5669946670532227,
+                    "product_url": "https://petrovich.ru/product/132633/",
+                    "category_url": "https://petrovich.ru/catalog/146041878/",
+                    "has_csv_image": true,
+                    "image_url": "https://cs.petrovich.ru/image/26993821/original.jpg"
+                }
+            ],
+            "processing_time": {
+                "embedding_seconds": 0.439,
+                "search_seconds": 0.017,
+                "total_seconds": 0.456
+            },
+            "device": "cpu",
+            "csv_loaded": true,
+            "total_images_in_csv": 60673
+        };
+
+        displayResults(mockData);
     }
 </script>
 </body>
