@@ -126,7 +126,7 @@ func RedirectHandler(config *internal.Config) http.Handler {
 
 func (s *Server) setupRoutes(router *gin.Engine) {
 	// Пример маршрута
-	router.GET("/", ProfilePage(s.template, s.logger))
+	router.GET("/profile", ProfilePage(s.template, s.logger))
 	router.GET("/image-search", ImageSearchPage(s.template, s.logger))
 	router.POST("/send", GetInTouchHandler(s.config, s.logger))
 	router.Static("/static", "./static") // статика, если понадобится
