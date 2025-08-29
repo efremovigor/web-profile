@@ -126,6 +126,7 @@ func RedirectHandler(config *internal.Config) http.Handler {
 
 func (s *Server) setupRoutes(router *gin.Engine) {
 	// Пример маршрута
+	router.GET("/", Page404(s.template, s.logger))
 	router.GET("/profile", ProfilePage(s.template, s.logger))
 	router.GET("/image-search", ImageSearchPage(s.template, s.logger))
 	router.POST("/send", GetInTouchHandler(s.config, s.logger))
@@ -163,6 +164,20 @@ func CustomRecovery(l *log.Logger) gin.HandlerFunc {
 		}()
 
 		c.Next()
+	}
+}
+
+func Page404(tmpl *template.Template, logger *log.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Устанавливаем заголовок Content-Type
+		c.Header("Content-Type", "text/html; charset=utf-8")
+
+		// Выполняем шаблон и записываем результат в ResponseWriter
+		if err := tmpl.ExecuteTemplate(c.Writer, "404.html", nil); err != nil {
+			logger.Log(log.Exception(fmt.Sprintf("error rendering template: %s", err), nil))
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
 	}
 }
 
