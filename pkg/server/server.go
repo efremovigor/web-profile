@@ -126,7 +126,6 @@ func RedirectHandler(config *internal.Config) http.Handler {
 
 func (s *Server) setupRoutes(router *gin.Engine) {
 	// Пример маршрута
-	router.GET("/", Page404(s.template, s.logger))
 	router.GET("/profile", ProfilePage(s.template, s.logger))
 	router.GET("/image-search", ImageSearchPage(s.template, s.logger))
 	router.POST("/send", GetInTouchHandler(s.config, s.logger))
@@ -141,6 +140,8 @@ func (s *Server) setupRoutes(router *gin.Engine) {
 	// Добавление роутов
 	router.POST("/image-search", ImageSearchHandler(pythonConfig))
 	router.GET("/health/image-search", HealthCheckHandler(pythonConfig))
+
+	router.NoRoute(Page404(s.template, s.logger))
 }
 
 func CustomRecovery(l *log.Logger) gin.HandlerFunc {
