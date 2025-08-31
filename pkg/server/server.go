@@ -127,6 +127,7 @@ func RedirectHandler(config *internal.Config) http.Handler {
 func (s *Server) setupRoutes(router *gin.Engine) {
 	// Пример маршрута
 	router.GET("/profile", ProfilePage(s.template, s.logger))
+	router.GET("/image-search-about", ImageSearchAboutPage(s.template, s.logger))
 	router.GET("/image-search", ImageSearchPage(s.template, s.logger))
 	router.POST("/send", GetInTouchHandler(s.config, s.logger))
 	router.Static("/static", "./static") // статика, если понадобится
@@ -189,6 +190,20 @@ func ProfilePage(tmpl *template.Template, logger *log.Logger) gin.HandlerFunc {
 
 		// Выполняем шаблон и записываем результат в ResponseWriter
 		if err := tmpl.ExecuteTemplate(c.Writer, "profile.html", nil); err != nil {
+			logger.Log(log.Exception(fmt.Sprintf("error rendering template: %s", err), nil))
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+	}
+}
+
+func ImageSearchAboutPage(tmpl *template.Template, logger *log.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Устанавливаем заголовок Content-Type
+		c.Header("Content-Type", "text/html; charset=utf-8")
+
+		// Выполняем шаблон и записываем результат в ResponseWriter
+		if err := tmpl.ExecuteTemplate(c.Writer, "image_search_about.html", nil); err != nil {
 			logger.Log(log.Exception(fmt.Sprintf("error rendering template: %s", err), nil))
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return

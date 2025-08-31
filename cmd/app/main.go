@@ -40,7 +40,7 @@ func run(ctx context.Context) (err error) {
 
 	logger := log.NewLogger(level, []log.Listener{log.NewConsoleListener()})
 	httpServer := server.NewServer(logger, &config)
-	httpServer.SetTemplate(template.Must(template.ParseFiles("static/template/profile.html", "static/template/image_search.html", "static/template/404.html")))
+	httpServer.SetTemplate(template.Must(template.ParseFiles("static/template/profile.html", "static/template/image_search.html", "static/template/404.html", "static/template/image_search_about.html")))
 
 	err = httpServer.Run(ctx)
 	if err != nil {
