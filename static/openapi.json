@@ -1,0 +1,130 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Image Search API",
+    "description": "API для поиска похожих изображений продуктов",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/image-search": {
+      "post": {
+        "summary": "Поиск похожих изображений продуктов",
+        "description": "Принимает изображение и возвращает список похожих продуктов с метриками схожести",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Изображение для поиска"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный поиск похожих изображений",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageSearchResponse"
+                },
+                "example": {
+                  "success": true,
+                  "results": [
+                    {
+                      "product_id": "143199",
+                      "category_id": "146041878",
+                      "similarity": 0.46929335594177246,
+                      "distance": 0.5307066440582275,
+                      "product_url": "https://qw.ru/product/143199/",
+                      "category_url": "https://qw.ru/catalog/146041878/",
+                      "has_csv_image": true,
+                      "image_url": "https://cs.qw.ru/image/26994759/original.jpg"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос - отсутствует изображение или неправильный формат"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ImageSearchResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Успешность выполнения запроса"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchResult"
+            },
+            "description": "Результаты поиска"
+          }
+        }
+      },
+      "SearchResult": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "description": "ID продукта"
+          },
+          "category_id": {
+            "type": "string",
+            "description": "ID категории"
+          },
+          "similarity": {
+            "type": "number",
+            "format": "float",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Метрика схожести (1 - идентично, 0 -完全不同)"
+          },
+          "distance": {
+            "type": "number",
+            "format": "float",
+            "description": "Расстояние в векторном пространстве"
+          },
+          "product_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL страницы продукта"
+          },
+          "category_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL страницы категории"
+          },
+          "has_csv_image": {
+            "type": "boolean",
+            "description": "Наличие изображения в CSV базе"
+          },
+          "image_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL изображения продукта"
+          }
+        }
+      }
+    }
+  }
+}
