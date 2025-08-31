@@ -3,691 +3,1243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VisionSearch - AI поиск товаров по изображению</title>
+    <title>ИИ поиск по изображению</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@3.25.0/swagger-ui.css" />
     <style>
-        :root {
-            --primary: #4361ee;
-            --secondary: #3a0ca3;
-            --accent: #f72585;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --gray: #6c757d;
-            --success: #4cc9f0;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         body {
-            color: var(--dark);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header styles */
-        header {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .header-container {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background: #f9fafb;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
+            flex-direction: column;
+            min-height: 100vh;
+            color: #333;
         }
-
-        .logo {
-            font-size: 24px;
+        header, footer {
+            background: #fff;
+            padding: 16px 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,.05);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             font-weight: 700;
-            color: var(--primary);
+        }
+        header p {
+            margin: 4px 0 0;
+            color: #555;
+        }
+        main {
+            flex: 1;
             display: flex;
+            flex-direction: column;
             align-items: center;
+            padding: 20px;
         }
-
-        .logo span {
-            color: var(--accent);
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-        }
-
-        nav ul li {
-            margin-left: 30px;
-        }
-
-        nav ul li a {
-            text-decoration: none;
-            color: var(--dark);
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        nav ul li a:hover {
-            color: var(--primary);
-        }
-
-        .btn {
-            display: inline-block;
-            background: var(--primary);
-            color: white;
-            padding: 12px 30px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: none;
+        .drop {
+            border: 2px dashed #ccc;
+            padding: 30px;
+            text-align: center;
+            border-radius: 12px;
+            background: #fff;
             cursor: pointer;
+            max-width: 500px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
         }
-
-        .btn:hover {
-            background: var(--secondary);
+        .drop:hover {
+            border-color: #3b82f6;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
         }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
+        canvas {
+            display: none;
+            margin-top: 20px;
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,.1);
         }
-
-        .btn-outline:hover {
-            background: var(--primary);
-            color: white;
+        .btn {
+            margin: 10px;
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #3b82f6;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
         }
-
-        /* Hero section */
-        .hero {
-            padding: 160px 0 100px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        .btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
         }
-
-        .hero-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
-
-        .hero-text {
-            flex: 1;
-            padding-right: 50px;
-        }
-
-        .hero-image {
-            flex: 1;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-
-        .hero p {
-            font-size: 18px;
-            color: var(--gray);
-            margin-bottom: 30px;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 15px;
-        }
-
-        /* Features section */
-        .features {
-            padding: 100px 0;
-            background: white;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .section-title h2 {
-            font-size: 36px;
-            margin-bottom: 15px;
-        }
-
-        .section-title p {
-            color: var(--gray);
+        section {
             max-width: 700px;
-            margin: 0 auto;
+            text-align: left;
+            margin: 40px 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-
-        .features-grid {
+        footer {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 40px;
+        }
+        .controls {
+            display: none;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1600px;
+            justify-content: center;
+            transition: all 0.3s ease;
+            gap: 30px;
+        }
+        .editor-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+            max-width: 40%;
+        }
+        .results-section {
+            flex: 1;
+            padding: 20px;
+            display: none;
+            width: 60%;
+        }
+        .results-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 30px;
+            margin-top: 20px;
         }
-
-        .feature-card {
-            background: var(--light);
-            border-radius: 10px;
-            padding: 30px;
-            text-align: center;
-            transition: transform 0.3s, box-shadow 0.3s;
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            aspect-ratio: 1 / 1;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto;
+            overflow: hidden;
         }
-
-        .feature-card:hover {
+        .product-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.2);
         }
-
-        .feature-icon {
-            width: 70px;
-            height: 70px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
+        .product-image-container {
+            width: 100%;
+            height: 315px;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 30px;
+            background-color: #f3f4f6;
         }
-
-        .feature-card h3 {
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+        .product-info {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .product-title {
+            margin: 0 0 10px 0;
+            color: #1f2937;
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        .product-similarity {
+            color: #4b5563;
+            font-size: 1rem;
+            font-weight: 500;
+            display: inline-block;
+            width: fit-content;
+            background: #f3f4f6;
+            padding: 4px 10px;
+            border-radius: 20px;
             margin-bottom: 15px;
         }
-
-        /* How it works */
-        .how-it-works {
-            padding: 100px 0;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        }
-
-        .steps {
+        .product-links {
             display: flex;
             justify-content: space-between;
-            margin-top: 50px;
-            position: relative;
+            gap: 12px;
+            margin-top: auto;
         }
-
-        .steps::before {
-            content: '';
-            position: absolute;
-            top: 40px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--primary);
-            z-index: 1;
+        .product-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: 8px 0;
+            transition: color 0.2s;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
         }
-
-        .step {
+        .product-link:hover {
+            text-decoration: underline;
+            color: #2563eb;
+        }
+        .search-title {
+            text-align: left;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        .search-meta {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .search-meta span {
+            font-weight: 600;
+            color: #3b82f6;
+        }
+        .loading {
+            display: none;
             text-align: center;
-            position: relative;
-            z-index: 2;
-            flex: 1;
+            margin: 20px 0;
         }
-
-        .step-number {
-            width: 40px;
-            height: 40px;
-            background: var(--primary);
-            color: white;
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #3b82f6;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-weight: bold;
-        }
-
-        /* Demo section */
-        .demo {
-            padding: 100px 0;
-            background: white;
-        }
-
-        .demo-container {
-            display: flex;
-            align-items: center;
-            gap: 50px;
-        }
-
-        .demo-text {
-            flex: 1;
-        }
-
-        .demo-visual {
-            flex: 1;
-            position: relative;
-        }
-
-        .demo-image {
-            width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .search-indicator {
-            position: absolute;
             width: 50px;
             height: 50px;
-            background: var(--primary);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .no-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 240px;
+            background-color: #f3f4f6;
+            color: #6b7280;
+            font-size: 1.1rem;
+            width: 100%;
+        }
+
+        /* Новые стили для улучшений */
+        .reset-btn {
+            margin: 10px;
+            padding: 8px 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #fff;
+            color: #666;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        .reset-btn:hover {
+            background: #f5f5f5;
+            border-color: #999;
+        }
+        .selection-info {
+            margin-top: 10px;
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        .zoom-controls {
+            margin: 10px 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+        .zoom-btn {
+            padding: 5px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        .zoom-btn:hover {
+            background: #f0f0f0;
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        .zoom-level {
+            font-size: 0.9rem;
+            color: #666;
+            min-width: 100px;
+            text-align: center;
+        }
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            border-radius: 12px;
+        }
+        .canvas-container {
+            position: relative;
+            display: inline-block;
+        }
+        .instructions {
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+            max-width: 500px;
+        }
+
+        /* Стили для новых блоков */
+        .how-it-works {
+            background: white;
+            padding: 50px 20px;
+            margin: 40px 0;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-radius: 12px;
+        }
+        .how-it-works h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 40px;
+            color: #1f2937;
+        }
+        .steps {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .step {
+            flex: 1;
+            min-width: 250px;
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            background: #f9fafb;
+            transition: all 0.3s ease;
+        }
+        .step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        .step-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #3b82f6;
+        }
+        .step h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #1f2937;
+        }
+        .step p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .openapi-section {
+            background: white;
+            padding: 50px 20px;
+            margin: 40px 0;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .openapi-section h2 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #1f2937;
+        }
+        .openapi-btn {
+            margin-bottom: 30px;
+        }
+        .openapi-content {
+            display: none;
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: left;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow: auto;
+            max-height: 600px;
+        }
+        .openapi-spec {
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .contact-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+            background: #3b82f6;
+            color: white;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            animation: pulse 2s infinite;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .contact-btn:hover {
+            background: #2563eb;
+            transform: scale(1.1);
         }
 
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.1);
-                opacity: 0.8;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        /* Integration */
-        .integration {
-            padding: 100px 0;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        }
-
-        .integration-content {
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .integration-content p {
-            margin-bottom: 30px;
-        }
-
-        /* CTA section */
-        .cta {
-            padding: 80px 0;
-            background: var(--primary);
-            color: white;
-            text-align: center;
-        }
-
-        .cta h2 {
-            font-size: 36px;
-            margin-bottom: 20px;
-        }
-
-        .cta p {
-            margin-bottom: 30px;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .cta .btn {
-            background: white;
-            color: var(--primary);
-        }
-
-        .cta .btn:hover {
-            background: var(--light);
-        }
-
-        /* Footer */
-        footer {
-            background: var(--dark);
-            color: white;
-            padding: 50px 0 20px;
-        }
-
-        .footer-content {
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
         }
-
-        .footer-logo {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 15px;
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-
-        .footer-links h4 {
+        .modal h3 {
+            margin-top: 0;
+            color: #1f2937;
+            font-size: 1.5rem;
+        }
+        .form-group {
             margin-bottom: 20px;
-            font-size: 18px;
         }
-
-        .footer-links ul {
-            list-style: none;
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
         }
-
-        .footer-links ul li {
-            margin-bottom: 10px;
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
         }
-
-        .footer-links ul li a {
-            color: #ddd;
-            text-decoration: none;
-            transition: color 0.3s;
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
         }
-
-        .footer-links ul li a:hover {
-            color: white;
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
         }
-
-        .copyright {
+        .modal-close {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        .modal-close:hover {
+            background: #e5e7eb;
+        }
+        .success-message {
+            display: none;
             text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: #ddd;
-            font-size: 14px;
+            padding: 20px;
+            background: #f0f9ff;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: #0369a1;
         }
 
-        /* Responsive styles */
-        @media (max-width: 992px) {
-            .hero-content {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .hero-text {
-                padding-right: 0;
-                margin-bottom: 50px;
-            }
-
-            .hero-buttons {
-                justify-content: center;
-            }
-
-            .features-grid {
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 1400px) {
+            .results-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 25px;
             }
-
-            .demo-container {
-                flex-direction: column;
+            .product-card {
+                max-width: 280px;
             }
         }
-
-        @media (max-width: 768px) {
-            .features-grid {
-                grid-template-columns: 1fr;
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+                gap: 20px;
             }
-
+            .editor-section, .results-section {
+                max-width: 100%;
+                width: 100%;
+            }
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            .product-card {
+                max-width: 100%;
+            }
             .steps {
                 flex-direction: column;
-                gap: 30px;
+                align-items: center;
             }
-
-            .steps::before {
-                display: none;
+            .step {
+                max-width: 500px;
+                width: 100%;
             }
-
-            .footer-content {
+        }
+        @media (max-width: 640px) {
+            .results-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .product-card {
+                max-width: 100%;
+                margin: 0;
+            }
+            .search-title {
+                font-size: 1.5rem;
+                text-align: center;
+            }
+            .search-meta {
                 flex-direction: column;
-                gap: 30px;
+                gap: 10px;
             }
-
-            nav ul {
-                display: none;
+            .product-links {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .zoom-controls {
+                flex-wrap: wrap;
+            }
+            .contact-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
             }
         }
     </style>
 </head>
 <body>
-<!-- Header -->
 <header>
-    <div class="container header-container">
-        <div class="logo">Vision<span>Search</span></div>
-        <nav>
-            <ul>
-                <li><a href="#features">Возможности</a></li>
-                <li><a href="#how-it-works">Как работает</a></li>
-                <li><a href="#demo">Демо</a></li>
-                <li><a href="#integration">Интеграция</a></li>
-            </ul>
-        </nav>
-        <a href="#contact" class="btn">Связаться с нами</a>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>ИИ поиск по изображению</h1>
+            <p>Загрузи картинку → выдели нужный фрагмент → найди похожие товары</p>
+        </div>
+        <button id="headerContactBtn" class="btn" style="margin: 0;">Связаться</button>
     </div>
 </header>
 
-<!-- Hero Section -->
-<section class="hero">
-    <div class="container hero-content">
-        <div class="hero-text">
-            <h1>AI-поиск товаров по изображению для вашего бизнеса</h1>
-            <p>Внедрите передовую технологию компьютерного зрения, чтобы ваши клиенты могли находить товары, просто загрузив изображение. Увеличьте конверсию и улучшите пользовательский опыт.</p>
-            <div class="hero-buttons">
-                <a href="#demo" class="btn">Узнать больше</a>
-                <a href="#contact" class="btn btn-outline">Запросить демо</a>
-            </div>
-        </div>
-        <div class="hero-image">
-            <img src="static/img/image_search/img.png" alt="AI Visual Search Illustration" width="500" style="border-radius: 25px;">
-        </div>
-    </div>
-</section>
-
-<!-- Features Section -->
-<section class="features" id="features">
-    <div class="container">
-        <div class="section-title">
-            <h2>Мощные возможности визуального поиска</h2>
-            <p>Наша технология использует передовые алгоритмы машинного обучения для точного распознавания и поиска товаров</p>
-        </div>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">✓</div>
-                <h3>Высокая точность</h3>
-                <p>Наш AI точно идентифицирует товары на изображениях с минимальной погрешностью</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <h3>Быстрый поиск</h3>
-                <p>Получайте результаты поиска за доли секунды для бесперебойного пользовательского опыта</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔄</div>
-                <h3>Простая интеграция</h3>
-                <p>RESTful API для легкого внедрения в вашу существующую инфраструктуру</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <h3>Аналитика</h3>
-                <p>Получайте ценную аналитику о поисковых запросах и поведении пользователей</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔍</div>
-                <h3>Расширенный поиск</h3>
-                <p>Поиск по цвету, форме, стилю и другим визуальным атрибутам</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📱</div>
-                <h3>Мобильная оптимизация</h3>
-                <p>Идеальная работа на всех устройствах, включая смартфоны и планшеты</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- How It Works Section -->
-<section class="how-it-works" id="how-it-works">
-    <div class="container">
-        <div class="section-title">
-            <h2>Как работает наш визуальный поиск</h2>
-            <p>Простой процесс интеграции и использования для вашего бизнеса и клиентов</p>
-        </div>
+<main>
+    <!-- Блок "Как это работает?" -->
+    <div class="how-it-works">
+        <h2>Как это работает?</h2>
         <div class="steps">
             <div class="step">
-                <div class="step-number">1</div>
-                <h3>Загрузка изображения</h3>
-                <p>Пользователь загружает фото интересующего товара</p>
+                <div class="step-icon">📸</div>
+                <h3>Загрузите изображение</h3>
+                <p>Загрузите фотографию товара, который вас интересует. Система поддерживает все популярные форматы изображений.</p>
             </div>
             <div class="step">
-                <div class="step-number">2</div>
-                <h3>Анализ изображения</h3>
-                <p>Наш AI анализирует визуальные характеристики товара</p>
+                <div class="step-icon">🔍</div>
+                <h3>Выделите область</h3>
+                <p>С помощью инструмента выделения укажите конкретную часть изображения, по которой нужно выполнить поиск.</p>
             </div>
             <div class="step">
-                <div class="step-number">3</div>
-                <h3>Поиск совпадений</h3>
-                <p>Система находит похожие товары в вашем каталоге</p>
+                <div class="step-icon">🤖</div>
+                <h3>ИИ анализ</h3>
+                <p>Наша нейросеть анализирует визуальные особенности изображения и ищет похожие товары в базе данных.</p>
             </div>
             <div class="step">
-                <div class="step-number">4</div>
-                <h3>Отображение результатов</h3>
-                <p>Пользователь получает релевантные результаты поиска</p>
+                <div class="step-icon">🛒</div>
+                <h3>Получите результаты</h3>
+                <p>Система покажет вам похожие товары с указанием процента совпадения и ссылками для покупки.</p>
             </div>
         </div>
     </div>
-</section>
-
-<!-- Demo Section -->
-<section class="demo" id="demo">
-    <div class="container">
-        <div class="section-title">
-            <h2>Демонстрация технологии</h2>
-            <p>Увидьте в действии, как наш AI находит похожие товары по изображению</p>
+    <!-- Блок с OpenAPI спецификацией -->
+    <div class="openapi-section">
+        <h2>API документация</h2>
+        <button id="toggleOpenApi" class="btn openapi-btn">Показать схему OpenAPI</button>
+        <div id="openApiContent" class="openapi-content">
+            <pre class="openapi-spec" id="openApiSpec"></pre>
         </div>
-        <div class="demo-container">
-            <div class="demo-text">
-                <h3>Интуитивный визуальный поиск</h3>
-                <p>Наша технология позволяет идентифицировать товары на изображениях и находить визуально похожие items из вашего каталога. Это идеальное решение для модных ритейлеров, мебельных магазинов и любых businesses, где визуальная составляющая товара важна для покупателей.</p>
-                <p>Система обучается на ваших товарах и постоянно улучшает точность распознавания благодаря машинному обучению.</p>
-                <a href="#contact" class="btn">Запросить персональную демонстрацию</a>
+    </div>
+
+    <div class="container" id="container">
+        <div class="editor-section" id="editorSection">
+            <section>
+                <h2>Попробуй демо</h2>
+                <div id="drop" class="drop">
+                    Перетащите картинку или кликните для выбора<br>
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                    <button onclick="fileInput.click()" class="btn">Выбрать файл</button>
+                </div>
+                <p class="instructions">После загрузки изображения выделите область для поиска, зажав левую кнопку мыши</p>
+            </section>
+
+            <div class="canvas-container">
+                <canvas id="editorCanvas"></canvas>
+                <div class="loading-overlay" id="canvasLoading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Загрузка изображения...</p>
+                </div>
             </div>
-            <div class="demo-visual">
-                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjM1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTAwIiBoZWlnaHQ9IjM1MCIgZmlsbD0iI2Y1ZjdmYSIgcng9IjEwIiByeT0iMTAiLz48cmVjdCB4PSIyMCIgeT0iMjAiIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjNDM2MWVlIiByeD0iNSIgcnk9IjUiLz48cGF0aCBkPSJNMjMwIDcwSDQ2ME0yMzAgMTIwSDQ2ME0yMzAgMTcwSDQ2ME0yMzAgMjIwSDQ2MCIgc3Ryb2tlPSIjZGRkIiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSIxMjAiIGN5PSIxMjAiIHI9IjUwIiBmaWxsPSIjZmY3Mjc2IiBvcGFjaXR5PSIwLjgiLz48Y2lyY2xlIGN4PSIzNTAiIGN5PSIxMDAiIHI9IjMwIiBmaWxsPSIjNDM2MWVlIiBvcGFjaXR5PSIwLjgiLz48Y2lyY2xlIGN4PSIzNTAiIGN5PSIxNzAiIHI9IjQwIiBmaWxsPSIjM2EwY2EzIiBvcGFjaXR5PSIwLjgiLz48Y2lyY2xlIGN4PSIzNTAiIGN5PSIyNTAiIHI9IjM1IiBmaWxsPSIjNGNjOWYwIiBvcGFjaXR5PSIwLjgiLz48L3N2Zz4=" alt="Visual Search Demo" class="demo-image">
-                <div class="search-indicator" style="top: 120px; left: 120px;">→</div>
+
+            <div class="selection-info" id="selectionInfo" style="display: none;">
+                Выделенная область: <span id="selectionSize">0x0</span> пикселей
+            </div>
+
+            <div class="controls">
+                <button id="sendBtn" class="btn">Найти похожие товары</button>
+                <button id="resetBtn" class="reset-btn">Сбросить выделение</button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Ищем похожие товары...</p>
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <h2 class="search-title">Результаты поиска</h2>
+            <div class="search-meta" id="searchMeta" style="display: none;">
+                <div>Найдено товаров: <span id="resultsCount">0</span></div>
+                <div>Время обработки: <span id="processingTime">0</span> сек.</div>
+            </div>
+            <div class="results-grid" id="resultsGrid">
+                <!-- Товары будут добавлены здесь через JavaScript -->
             </div>
         </div>
     </div>
-</section>
 
-<!-- Integration Section -->
-<section class="integration" id="integration">
-    <div class="container">
-        <div class="section-title">
-            <h2>Простая интеграция с вашей платформой</h2>
-            <p>Быстро внедрите технологию визуального поиска в ваш существующий продукт</p>
-        </div>
-        <div class="integration-content">
-            <p>Наше решение легко интегрируется с популярными e-commerce платформами, системами управления контентом и мобильными приложениями. Мы предоставляем comprehensive документацию и поддержку на всех этапах интеграции.</p>
-            <p>API поддерживает все основные языки программирования и frameworks, что делает процесс внедрения максимально простым для вашей команды разработчиков.</p>
-            <a href="#contact" class="btn">Получить документацию по API</a>
+
+</main>
+
+<!-- Кнопка связаться -->
+<div class="contact-btn" id="contactButton">
+    ✉️
+</div>
+
+<!-- Модальное окно связи -->
+<div class="modal-overlay" id="contactModal">
+    <div class="modal">
+        <h3>Свяжитесь с нами</h3>
+        <form id="contactForm">
+            <div class="form-group" style="max-width: 95%;">
+                <label for="name">Ваше имя</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group" style="max-width: 95%;">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group" style="max-width: 95%;">
+                <label for="msg">Сообщение</label>
+                <textarea id="msg" name="msg" required></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn modal-close" id="closeModal">Закрыть</button>
+                <button type="submit" class="btn">Отправить</button>
+            </div>
+        </form>
+        <div class="success-message" id="successMessage">
+            <h3>Спасибо за ваше сообщение!</h3>
+            <p>Мы свяжемся с вами в ближайшее время.</p>
         </div>
     </div>
-</section>
+</div>
 
-<!-- CTA Section -->
-<section class="cta" id="contact">
-    <div class="container">
-        <h2>Готовы преобразовать пользовательский опыт?</h2>
-        <p>Свяжитесь с нами сегодня, чтобы узнать больше о возможностях внедрения AI-поиска по изображению в ваш бизнес</p>
-        <a href="#" class="btn">Запросить консультацию</a>
-    </div>
-</section>
-
-<!-- Footer -->
 <footer>
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-info">
-                <div class="footer-logo">VisionSearch</div>
-                <p>Передовая технология AI-поиска по изображению для вашего бизнеса</p>
-            </div>
-            <div class="footer-links">
-                <h4>Продукт</h4>
-                <ul>
-                    <li><a href="#features">Возможности</a></li>
-                    <li><a href="#how-it-works">Как работает</a></li>
-                    <li><a href="#demo">Демо</a></li>
-                    <li><a href="#integration">Интеграция</a></li>
-                </ul>
-            </div>
-            <div class="footer-links">
-                <h4>Компания</h4>
-                <ul>
-                    <li><a href="#">О нас</a></li>
-                    <li><a href="#">Блог</a></li>
-                    <li><a href="#">Вакансии</a></li>
-                    <li><a href="#">Партнеры</a></li>
-                </ul>
-            </div>
-            <div class="footer-links">
-                <h4>Поддержка</h4>
-                <ul>
-                    <li><a href="#">Документация</a></li>
-                    <li><a href="#">API Reference</a></li>
-                    <li><a href="#">Контакты</a></li>
-                    <li><a href="#">Помощь</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="copyright">
-            <p>&copy; 2023 VisionSearch. Все права защищены.</p>
-        </div>
-    </div>
+    © 2025 ИИ поиск по изображению
 </footer>
-
+<script src="https://unpkg.com/swagger-ui-dist@3.25.0/swagger-ui-bundle.js"></script>
 <script>
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
+    const drop = document.getElementById('drop');
+    const fileInput = document.getElementById('fileInput');
+    const canvas = document.getElementById('editorCanvas');
+    const ctx = canvas.getContext('2d');
+    const sendBtn = document.getElementById('sendBtn');
+    const controls = document.querySelector('.controls');
+    const container = document.getElementById('container');
+    const editorSection = document.getElementById('editorSection');
+    const resultsSection = document.getElementById('resultsSection');
+    const resultsGrid = document.getElementById('resultsGrid');
+    const loading = document.getElementById('loading');
+    const searchMeta = document.getElementById('searchMeta');
+    const resultsCount = document.getElementById('resultsCount');
+    const processingTime = document.getElementById('processingTime');
+    const resetBtn = document.getElementById('resetBtn');
+    const selectionInfo = document.getElementById('selectionInfo');
+    const selectionSize = document.getElementById('selectionSize');
+    const canvasLoading = document.getElementById('canvasLoading');
 
-            const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
+    // Переменные для новых блоков
+    const toggleOpenApiBtn = document.getElementById('toggleOpenApi');
+    const openApiContent = document.getElementById('openApiContent');
+    const headerContactBtn = document.getElementById('headerContactBtn');
+    const contactButton = document.getElementById('contactButton');
+    const contactModal = document.getElementById('contactModal');
+    const contactForm = document.getElementById('contactForm');
+    const closeModal = document.getElementById('closeModal');
+    const successMessage = document.getElementById('successMessage');
 
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                window.scrollTo({
-                    top: targetElement.offsetTop - 80,
-                    behavior: 'smooth'
+    // URL API endpoint (замените на ваш реальный endpoint)
+    const API_URL = '/image-search';
+
+    let img = null;
+    let sel = null;
+    let dragging = false;
+    let scale = 1;
+    let currentZoom = 1;
+    let originalWidth = 0;
+    let originalHeight = 0;
+    let isOpenApiVisible = false;
+
+    // Инициализация
+    function init() {
+        fetch('static/openapi.json')
+            .then(response => response.json())
+            .then(spec => {
+                SwaggerUIBundle({
+                    spec: spec,
+                    dom_id: '#openApiSpec',
                 });
-            }
+            });
+
+        // Настройка обработчиков событий
+        setupEventListeners();
+    }
+
+    // Настройка обработчиков событий
+    function setupEventListeners() {
+        // Обработчики для загрузки изображения
+        drop.addEventListener('dragover', e => {
+            e.preventDefault();
+            drop.style.borderColor="#3b82f6";
+            drop.style.transform = "translateY(-2px)";
         });
-    });
-
-    // Simple animation for features cards on scroll
-    const featureCards = document.querySelectorAll('.feature-card');
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = 1;
-                entry.target.style.transform = 'translateY(0)';
-            }
+        drop.addEventListener('dragleave', () => {
+            drop.style.borderColor="#ccc";
+            drop.style.transform = "translateY(0)";
         });
-    }, { threshold: 0.1 });
+        drop.addEventListener('drop', e => {
+            e.preventDefault();
+            drop.style.borderColor="#3b82f6";
+            drop.style.transform = "translateY(0)";
+            handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
 
-    featureCards.forEach(card => {
-        card.style.opacity = 0;
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        observer.observe(card);
-    });
+        // Обработчики для canvas
+        canvas.addEventListener('mousedown', handleCanvasMouseDown);
+        canvas.addEventListener('mousemove', handleCanvasMouseMove);
+        canvas.addEventListener('mouseup', handleCanvasMouseUp);
+
+        // Обработчики кнопок
+        sendBtn.addEventListener('click', sendImageForSearch);
+        resetBtn.addEventListener('click', resetSelection);
+
+        // Обработчики для новых блоков
+        toggleOpenApiBtn.addEventListener('click', toggleOpenApi);
+        headerContactBtn.addEventListener('click', openContactModal);
+        contactButton.addEventListener('click', openContactModal);
+        closeModal.addEventListener('click', closeContactModal);
+        contactForm.addEventListener('submit', handleContactFormSubmit);
+
+        // Обработчик клавиши ESC
+        document.addEventListener('keydown', handleKeyDown);
+    }
+
+    // Обработчики событий
+    function handleCanvasMouseDown(e) {
+        if (!img) return;
+
+        const pos = getCanvasMousePos(e);
+        dragging = true;
+
+        sel = {
+            x: pos.x,
+            y: pos.y,
+            w: 0,
+            h: 0
+        };
+
+        redraw();
+        updateSelectionInfo();
+    }
+
+    function handleCanvasMouseMove(e) {
+        if (!img || !dragging || !sel) return;
+
+        const pos = getCanvasMousePos(e);
+        sel.w = pos.x - sel.x;
+        sel.h = pos.y - sel.y;
+
+        redraw();
+        updateSelectionInfo();
+    }
+
+    function handleCanvasMouseUp() {
+        dragging = false;
+
+        if (sel) {
+            if (sel.w < 0) {
+                sel.x += sel.w;
+                sel.w = Math.abs(sel.w);
+            }
+            if (sel.h < 0) {
+                sel.y += sel.h;
+                sel.h = Math.abs(sel.h);
+            }
+
+            if (sel.w < 5) sel.w = 5;
+            if (sel.h < 5) sel.h = 5;
+        }
+
+        redraw();
+        updateSelectionInfo();
+    }
+
+    function handleKeyDown(e) {
+        if (e.key === "Escape" && img) {
+            resetSelection();
+        }
+    }
+
+    function toggleOpenApi() {
+        isOpenApiVisible = !isOpenApiVisible;
+
+        if (isOpenApiVisible) {
+            openApiContent.style.display = "block";
+            toggleOpenApiBtn.textContent = "Скрыть схему OpenAPI";
+        } else {
+            openApiContent.style.display = "none";
+            toggleOpenApiBtn.textContent = "Показать схему OpenAPI";
+        }
+    }
+
+    function openContactModal() {
+        contactModal.style.display = "flex";
+    }
+
+    function closeContactModal() {
+        contactModal.style.display = "none";
+        successMessage.style.display = "none";
+        contactForm.reset();
+    }
+
+    function handleContactFormSubmit(e) {
+        e.preventDefault();
+
+        // Собираем данные формы
+        const formData = {
+            subject: "image-search form",
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            msg: document.getElementById('msg').value
+        };
+
+        // Отправляем JSON запрос на сервер
+        fetch('/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Показываем сообщение об успехе
+                    contactForm.style.display = "none";
+                    successMessage.style.display = "block";
+
+                    // Через 3 секунды закроем модальное окно
+                    setTimeout(() => {
+                        closeContactModal();
+                        contactForm.style.display = "block";
+                    }, 3000);
+                } else {
+                    throw new Error('Ошибка отправки формы');
+                }
+            })
+            .catch(error => {
+                console.error("Ошибка отправки формы:", error);
+                alert("Произошла ошибка при отправке сообщения. Пожалуйста, попробуйте еще раз.");
+            });
+    }
+
+    // Функции для работы с изображением
+    function handleFile(file){
+        if (!file) return;
+        if (!file.type.match('image.*')) {
+            alert('Пожалуйста, выберите файл изображения (JPEG, PNG, etc.)');
+            return;
+        }
+
+        canvasLoading.style.display = "flex";
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            img = new Image();
+            img.onload = () => {
+                originalWidth = img.width;
+                originalHeight = img.height;
+
+                const maxW = Math.min(window.innerWidth-40, 800);
+                const ratio = img.width/img.height;
+                let cw = maxW, ch = Math.round(cw/ratio);
+                if (ch > window.innerHeight*0.6){
+                    ch = Math.round(window.innerHeight*0.6);
+                    cw = Math.round(ch*ratio);
+                }
+
+                canvas.width = cw;
+                canvas.height = ch;
+                scale = img.width/cw;
+                sel = null;
+                currentZoom = 1;
+
+                canvas.style.display = "block";
+                controls.style.display = "block";
+
+                redraw();
+                canvasLoading.style.display = "none";
+            };
+            img.onerror = () => {
+                alert('Ошибка загрузки изображения');
+                canvasLoading.style.display = "none";
+            };
+            img.src = reader.result;
+        };
+        reader.onerror = () => {
+            alert('Ошибка чтения файла');
+            canvasLoading.style.display = "none";
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function adjustZoom(factor) {
+        if (!img) return;
+
+        currentZoom += factor;
+        currentZoom = Math.max(0.1, Math.min(5, currentZoom));
+
+        const newWidth = Math.round(originalWidth * currentZoom);
+        const newHeight = Math.round(originalHeight * currentZoom);
+
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+        scale = img.width / newWidth;
+
+        redraw();
+
+        updateSelectionInfo();
+    }
+
+    function redraw(){
+        if (!img) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        if (sel){
+            // Затемнение всего изображения
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // "Окно" выделения
+            ctx.save();
+            ctx.globalCompositeOperation = "destination-out";
+            ctx.fillStyle = "rgba(0,0,0,1)";
+            ctx.fillRect(sel.x, sel.y, sel.w, sel.h);
+            ctx.restore();
+
+            // Вернуть сам фрагмент сверху
+            ctx.drawImage(
+                img,
+                sel.x * scale, sel.y * scale, sel.w * scale, sel.h * scale,
+                sel.x, sel.y, sel.w, sel.h
+            );
+
+            // Рамка выделения
+            ctx.strokeStyle = "#3b82f6";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(sel.x, sel.y, sel.w, sel.h);
+
+            // Угловые маркеры для лучшей видимости
+            const markerSize = 8;
+            ctx.fillStyle = "#3b82f6";
+
+            // Левый верхний
+            ctx.fillRect(sel.x - markerSize/2, sel.y - markerSize/2, markerSize, markerSize);
+            // Правый верхний
+            ctx.fillRect(sel.x + sel.w - markerSize/2, sel.y - markerSize/2, markerSize, markerSize);
+            // Левый нижний
+            ctx.fillRect(sel.x - markerSize/2, sel.y + sel.h - markerSize/2, markerSize, markerSize);
+            // Правый нижний
+            ctx.fillRect(sel.x + sel.w - markerSize/2, sel.y + sel.h - markerSize/2, markerSize, markerSize);
+        }
+    }
+
+    function updateSelectionInfo() {
+        if (sel && sel.w >= 5 && sel.h >= 5) {
+            const realWidth = Math.round(sel.w * scale);
+            const realHeight = Math.round(sel.h * scale);
+            selectionSize.textContent = `${realWidth}×${realHeight}`;
+            selectionInfo.style.display = "block";
+        } else {
+            selectionInfo.style.display = "none";
+        }
+    }
+
+    function getCanvasMousePos(event) {
+        const rect = canvas.getBoundingClientRect();
+        const x = (event.clientX - rect.left) * (canvas.width / rect.width);
+        const y = (event.clientY - rect.top) * (canvas.height / rect.height);
+        return { x, y };
+    }
+
+    function resetSelection() {
+        sel = null;
+        redraw();
+        updateSelectionInfo();
+    }
+
+    async function sendImageForSearch() {
+        let sx, sy, sw, sh;
+
+        if (sel && sel.w >= 5 && sel.h >= 5) {
+            sx = Math.round(sel.x * scale);
+            sy = Math.round(sel.y * scale);
+            sw = Math.round(sel.w * scale);
+            sh = Math.round(sel.h * scale);
+        } else {
+            sx = 0;
+            sy = 0;
+            sw = img.width;
+            sh = img.height;
+        }
+
+        const out = document.createElement('canvas');
+        out.width = sw;
+        out.height = sh;
+        out.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+
+        try {
+            loading.style.display = "block";
+            sendBtn.disabled = true;
+
+            const blob = await new Promise(r => out.toBlob(r, "image/jpeg", 0.9));
+            const fd = new FormData();
+            fd.append("image", blob, "crop.jpg");
+            if (sel && sel.w >= 5 && sel.h >= 5) {
+                fd.append("coords", JSON.stringify({x: sx, y: sy, w: sw, h: sh}));
+            }
+
+            // Отправляем запрос на сервер
+            const response = await fetch(API_URL, {
+                method: "POST",
+                body: fd
+            });
+
+            if (!response.ok) {
+                throw new Error(`Ошибка сервера: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Показываем результаты
+                displayResults(data);
+            } else {
+                throw new Error("Не удалось выполнить поиск");
+            }
+
+        } catch (error) {
+            console.error("Ошибка:", error);
+            alert("Произошла ошибка при поиске товаров: " + error.message);
+
+            // Для демонстрации показываем mock-результаты при ошибке
+            displayMockResults();
+        } finally {
+            // Скрываем индикатор загрузки
+            loading.style.display = "none";
+            sendBtn.disabled = false;
+        }
+    }
+
+    function displayResults(data) {
+        resultsGrid.innerHTML = '';
+
+        resultsCount.textContent = data.results.length;
+        processingTime.textContent = data.processing_time.total_seconds.toFixed(3);
+        searchMeta.style.display = 'flex';
+
+        // Добавляем товары в сетку
+        data.results.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+
+            // Форматируем сходство в проценты
+            const similarityPercent = (product.similarity * 100).toFixed(1);
+
+            // Создаем элемент изображения с обработкой ошибок
+            let imageHtml;
+            if (product.image_url) {
+                imageHtml = `
+                    <div class="product-image-container">
+                        <img src="${product.image_url}" alt="Товар ${product.product_id}" class="product-image" onerror="handleImageError(this)">
+                    </div>
+                `;
+            } else {
+                imageHtml = `<div class="no-image">Изображение недоступно</div>`;
+            }
+
+            productCard.innerHTML = `
+                ${imageHtml}
+                <div class="product-info">
+                    <h3 class="product-title">Товар #${product.product_id}</h3>
+                    <div class="product-similarity">Сходство: ${similarityPercent}%</div>
+                    <div class="product-links">
+                        <a href="${product.product_url || '#'}" target="_blank" class="product-link">Страница товара</a>
+                        <a href="${product.category_url || '#'}" target="_blank" class="product-link">Категория</a>
+                    </div>
+                </div>
+            `;
+
+            resultsGrid.appendChild(productCard);
+        });
+
+        container.style.flexDirection = "row";
+        editorSection.style.maxWidth = "40%";
+        resultsSection.style.display = "block";
+
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function handleImageError(img) {
+        const container = img.parentElement;
+        container.innerHTML = '<div class="no-image">Изображение не загружено</div>';
+    }
+
+    function displayMockResults() {
+        const mockData = {
+            "success": true,
+            "results": [
+                {
+                    "product_id": "143199",
+                    "category_id": "146041878",
+                    "similarity": 0.46929335594177246,
+                    "distance": 0.5307066440582275,
+                    "product_url": "https://petrovich.ru/product/143199/",
+                    "category_url": "https://petrovich.ru/catalog/146041878/",
+                    "has_csv_image": true,
+                    "image_url": "https://cs.petrovich.ru/image/26994759/original.jpg"
+                },
+                {
+                    "product_id": "148962",
+                    "category_id": "146041878",
+                    "similarity": 0.4410020709037781,
+                    "distance": 0.5589979290962219,
+                    "product_url": "https://petrovich.ru/product/148962/",
+                    "category_url": "https://petrovich.ru/catalog/146041878/",
+                    "has_csv_image": true,
+                    "image_url": "https://cs.petrovich.ru/image/105585/original.jpg"
+                },
+                {
+                    "product_id": "132633",
+                    "category_id": "146041878",
+                    "similarity": 0.43300533294677734,
+                    "distance": 0.5669946670532227,
+                    "product_url": "https://petrovich.ru/product/132633/",
+                    "category_url": "https://petrovich.ru/catalog/146041878/",
+                    "has_csv_image": true,
+                    "image_url": "https://cs.petrovich.ru/image/26993821/original.jpg"
+                }
+            ],
+            "processing_time": {
+                "embedding_seconds": 0.439,
+                "search_seconds": 0.017,
+                "total_seconds": 0.456
+            },
+            "device": "cpu",
+            "csv_loaded": true,
+            "total_images_in_csv": 60673
+        };
+
+        displayResults(mockData);
+    }
+
+    // Инициализация при загрузке страницы
+    window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
