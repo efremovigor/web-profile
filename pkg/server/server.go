@@ -2,25 +2,25 @@ package server
 
 import (
 	"context"
-	"encoding/binary"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/acme/autocert"
-	"golang.org/x/sync/errgroup"
-	"html/template"
 	"io"
-	"net"
 	"net/http"
 	"net/url"
 	"time"
+	pb "web_profile"
+
+	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/acme/autocert"
+	"golang.org/x/sync/errgroup"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"html/template"
 	"web_profile/internal"
 	"web_profile/pkg/log"
 )
 
 func NewServer(logger *log.Logger, config *internal.Config) Server {
-
 	return Server{
 		logger: logger,
 		config: config,
@@ -38,7 +38,6 @@ func (s *Server) SetTemplate(template *template.Template) {
 }
 
 func (s *Server) Run(ctx context.Context) error {
-
 	g, ctx := errgroup.WithContext(ctx)
 	gin.DefaultWriter = s.logger
 
@@ -60,14 +59,13 @@ func (s *Server) runRedirectServer(g *errgroup.Group, ctx context.Context) {
 }
 
 func (s *Server) runWebServer(g *errgroup.Group, ctx context.Context) {
-	// Создаём общий роутер для приложения
 	router := gin.New()
-	router.Use(gin.LoggerWithWriter(s.logger), CustomRecovery(s.logger))
+	router.Use(gin.LoggerWithWriter(s.logger))
 
 	s.setupRoutes(router)
-	// HTTPS-сервер
+
 	httpsServer := &http.Server{
-		Addr:    s.config.GetHttpsSocket(), // например ":443"
+		Addr:    s.config.GetHttpsSocket(),
 		Handler: router,
 	}
 	if s.config.IsDev() {
@@ -78,7 +76,6 @@ func (s *Server) runWebServer(g *errgroup.Group, ctx context.Context) {
 }
 
 func (s *Server) runServer(server *http.Server, isHttps bool) func() error {
-
 	if isHttps && !s.config.IsDev() {
 		return func() error {
 			s.logger.Log(log.Info(fmt.Sprintf("listening on https://%s", s.config.Env.Domain), nil))
@@ -124,25 +121,272 @@ func RedirectHandler(config *internal.Config) http.Handler {
 	)
 }
 
+// GRPCClientConfig конфигурация gRPC клиента
+type GRPCClientConfig struct {
+	Host    string
+	Port    int
+	Timeout time.Duration
+}
+
+// DefaultGRPCConfig дефолтная конфигурация gRPC
+var DefaultGRPCConfig = GRPCClientConfig{
+	Host:    "localhost",
+	Port:    9999,
+	Timeout: 30 * time.Second,
+}
+
+// createGRPCClient создает gRPC клиент
+func createGRPCClient(config GRPCClientConfig) (pb.ImageSearchServiceClient, func(), error) {
+	ctx, cancel := context.WithTimeout(context.Background(), config.Timeout)
+	defer cancel()
+
+	conn, err := grpc.DialContext(ctx,
+		fmt.Sprintf("%s:%d", config.Host, config.Port),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithBlock(),
+	)
+	if err != nil {
+		return nil, nil, fmt.Errorf("gRPC connection failed: %v", err)
+	}
+
+	client := pb.NewImageSearchServiceClient(conn)
+	return client, func() { conn.Close() }, nil
+}
+
 func (s *Server) setupRoutes(router *gin.Engine) {
-	// Пример маршрута
 	router.GET("/profile", ProfilePage(s.template, s.logger))
 	router.GET("/image-search-about", ImageSearchAboutPage(s.template, s.logger))
 	router.GET("/image-search", ImageSearchPage(s.template, s.logger))
 	router.POST("/send", GetInTouchHandler(s.config, s.logger))
 	router.Static("/static", "./static") // статика, если понадобится
-	// Настройка Python сервера
-	pythonConfig := PythonServerConfig{
-		Host:    "localhost", // или IP вашего Python сервера
+
+	router.NoRoute(Page404(s.template, s.logger))
+
+	grpcConfig := GRPCClientConfig{
+		Host:    "localhost",
 		Port:    9999,
 		Timeout: 30 * time.Second,
 	}
 
-	// Добавление роутов
-	router.POST("/image-search", ImageSearchHandler(pythonConfig))
-	router.GET("/health/image-search", HealthCheckHandler(pythonConfig))
+	router.POST("/image-search", s.ImageSearchHandler(grpcConfig))
+	router.GET("/health/image-search", s.HealthCheckHandler(grpcConfig))
+}
 
-	router.NoRoute(Page404(s.template, s.logger))
+// ImageSearchRequest запрос от пользователя
+type ImageSearchRequest struct {
+	TopK    int  `form:"top_k" json:"top_k" binding:"min=1,max=100"`
+	NoCache bool `form:"no_cache" json:"no_cache"`
+}
+
+// ImageSearchHandler обработчик поиска по изображению через gRPC
+func (s *Server) ImageSearchHandler(config GRPCClientConfig) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		startTime := time.Now()
+
+		// Получение файла из запроса
+		file, err := c.FormFile("image")
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"error":   "Image file is required",
+			})
+			return
+		}
+
+		// Проверка размера файла
+		if file.Size > 10*1024*1024 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"error":   "Image size exceeds 10MB limit",
+			})
+			return
+		}
+
+		// Проверка типа файла
+		allowedTypes := map[string]bool{
+			"image/jpeg": true,
+			"image/jpg":  true,
+			"image/png":  true,
+		}
+		if !allowedTypes[file.Header.Get("Content-Type")] {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"error":   "Unsupported image format. Supported: JPEG, PNG",
+			})
+			return
+		}
+
+		// Чтение файла
+		openedFile, err := file.Open()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"error":   fmt.Sprintf("Failed to open file: %v", err),
+			})
+			return
+		}
+		defer openedFile.Close()
+
+		imageData, err := io.ReadAll(openedFile)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"error":   fmt.Sprintf("Failed to read file: %v", err),
+			})
+			return
+		}
+
+		// Создание gRPC клиента
+		client, closeFn, err := createGRPCClient(config)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success":     false,
+				"error":       fmt.Sprintf("gRPC connection failed: %v", err),
+				"proxy_error": true,
+			})
+			return
+		}
+		defer closeFn()
+
+		// Вызов gRPC метода
+		ctx, cancel := context.WithTimeout(context.Background(), config.Timeout)
+		defer cancel()
+
+		request := &pb.SearchRequest{
+			ImageData: imageData,
+			TopK:      9,
+			UseCache:  false,
+		}
+
+		response, err := client.SearchImage(ctx, request)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success":     false,
+				"error":       fmt.Sprintf("Search failed: %v", err),
+				"proxy_error": true,
+			})
+			return
+		}
+
+		// Конвертация gRPC response в JSON response
+		jsonResponse := convertToJSONResponse(response)
+
+		// Добавляем время проксирования
+		proxyTime := time.Since(startTime).Seconds()
+		if jsonResponse.ProcessingTime.TotalSeconds > 0 {
+			jsonResponse.ProcessingTime.TotalSeconds += proxyTime
+		}
+
+		if jsonResponse.Success {
+			c.JSON(http.StatusOK, jsonResponse)
+		} else {
+			c.JSON(http.StatusInternalServerError, jsonResponse)
+		}
+	}
+}
+
+// HealthCheckHandler проверка здоровья через gRPC
+func (s *Server) HealthCheckHandler(config GRPCClientConfig) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		client, closeFn, err := createGRPCClient(config)
+		if err != nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"status":   "unhealthy",
+				"service":  "python_search",
+				"error":    err.Error(),
+				"endpoint": fmt.Sprintf("%s:%d", config.Host, config.Port),
+			})
+			return
+		}
+		defer closeFn()
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		response, err := client.HealthCheck(ctx, &pb.HealthCheckRequest{})
+		if err != nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"status":   "unhealthy",
+				"service":  "python_search",
+				"error":    err.Error(),
+				"endpoint": fmt.Sprintf("%s:%d", config.Host, config.Port),
+			})
+			return
+		}
+
+		if !response.Healthy {
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"status":   "unhealthy",
+				"service":  "python_search",
+				"error":    response.Status,
+				"endpoint": fmt.Sprintf("%s:%d", config.Host, config.Port),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status":   "healthy",
+			"service":  "python_search",
+			"endpoint": fmt.Sprintf("%s:%d", config.Host, config.Port),
+			"details":  response.Status,
+		})
+	}
+}
+
+// convertToJSONResponse конвертирует gRPC response в JSON структуру
+func convertToJSONResponse(response *pb.SearchResponse) *SearchResponse {
+	jsonResponse := &SearchResponse{
+		Success: response.Success,
+		Error:   response.Error,
+		Device:  response.Device,
+		Cached:  response.Cached,
+	}
+
+	if response.ProcessingTime != nil {
+		jsonResponse.ProcessingTime.EmbeddingSeconds = response.ProcessingTime.EmbeddingSeconds
+		jsonResponse.ProcessingTime.SearchSeconds = response.ProcessingTime.SearchSeconds
+		jsonResponse.ProcessingTime.TotalSeconds = response.ProcessingTime.TotalSeconds
+	}
+
+	for _, result := range response.Results {
+		jsonResult := SearchResult{
+			ProductID:   result.ProductId,
+			CategoryID:  result.CategoryId,
+			Similarity:  result.Similarity,
+			Distance:    result.Distance,
+			ProductURL:  result.ProductUrl,
+			CategoryURL: result.CategoryUrl,
+			ImageURL:    result.ImageUrl,
+		}
+		jsonResponse.Results = append(jsonResponse.Results, jsonResult)
+	}
+
+	return jsonResponse
+}
+
+// SearchResult структура результата
+type SearchResult struct {
+	ProductID   string  `json:"product_id"`
+	CategoryID  string  `json:"category_id"`
+	Similarity  float64 `json:"similarity"`
+	Distance    float64 `json:"distance"`
+	ProductURL  string  `json:"product_url"`
+	CategoryURL string  `json:"category_url"`
+	ImageURL    string  `json:"image_url"`
+}
+
+// SearchResponse структура ответа
+type SearchResponse struct {
+	Success        bool           `json:"success"`
+	Results        []SearchResult `json:"results,omitempty"`
+	Error          string         `json:"error,omitempty"`
+	ProcessingTime struct {
+		EmbeddingSeconds float64 `json:"embedding_seconds"`
+		SearchSeconds    float64 `json:"search_seconds"`
+		TotalSeconds     float64 `json:"total_seconds"`
+	} `json:"processing_time,omitempty"`
+	Device string `json:"device,omitempty"`
+	Cached bool   `json:"cached,omitempty"`
 }
 
 func CustomRecovery(l *log.Logger) gin.HandlerFunc {
@@ -283,254 +527,4 @@ func sendToTelegram(config *internal.Config, name, email, subject, msg string) e
 	}
 
 	return nil
-}
-
-// SearchRequest структура запроса к Python серверу
-type SearchRequest struct {
-	TopK      int  `json:"top_k"`
-	ImageSize int  `json:"image_size"`
-	UseCache  bool `json:"use_cache"`
-}
-
-// SearchResult структура результата
-type SearchResult struct {
-	ProductID   string  `json:"product_id"`
-	CategoryID  string  `json:"category_id"`
-	Similarity  float64 `json:"similarity"`
-	Distance    float64 `json:"distance"`
-	ProductURL  string  `json:"product_url"`
-	CategoryURL string  `json:"category_url"`
-	ImageURL    string  `json:"image_url"`
-}
-
-// SearchResponse структура ответа от Python сервера
-type SearchResponse struct {
-	Success        bool           `json:"success"`
-	Results        []SearchResult `json:"results,omitempty"`
-	Error          string         `json:"error,omitempty"`
-	ProcessingTime struct {
-		EmbeddingSeconds float64 `json:"embedding_seconds"`
-		SearchSeconds    float64 `json:"search_seconds"`
-		TotalSeconds     float64 `json:"total_seconds"`
-	} `json:"processing_time,omitempty"`
-	Device string `json:"device,omitempty"`
-	Cached bool   `json:"cached,omitempty"`
-}
-
-// Config конфигурация Python сервера
-type PythonServerConfig struct {
-	Host    string
-	Port    int
-	Timeout time.Duration
-}
-
-// DefaultConfig дефолтная конфигурация
-var DefaultConfig = PythonServerConfig{
-	Host:    "localhost",
-	Port:    9999,
-	Timeout: 30 * time.Second,
-}
-
-// searchImage отправляет изображение на Python сервер и возвращает результат
-func searchImage(imageData []byte, topK int, useCache bool, config PythonServerConfig) (*SearchResponse, error) {
-	serverAddr := fmt.Sprintf("%s:%d", config.Host, config.Port)
-
-	// Установка соединения
-	conn, err := net.DialTimeout("tcp", serverAddr, config.Timeout)
-	if err != nil {
-		return nil, fmt.Errorf("connection to python server failed: %v", err)
-	}
-	defer conn.Close()
-
-	// Установка таймаута на операции
-	conn.SetDeadline(time.Now().Add(config.Timeout))
-
-	// Подготовка метаданных
-	request := SearchRequest{
-		TopK:      topK,
-		ImageSize: len(imageData),
-		UseCache:  useCache,
-	}
-
-	// Сериализация метаданных
-	metadataJSON, err := json.Marshal(request)
-	if err != nil {
-		return nil, fmt.Errorf("JSON marshaling failed: %v", err)
-	}
-
-	// Отправка заголовка (размер метаданных)
-	header := make([]byte, 4)
-	binary.BigEndian.PutUint32(header, uint32(len(metadataJSON)))
-	_, err = conn.Write(header)
-	if err != nil {
-		return nil, fmt.Errorf("header send failed: %v", err)
-	}
-
-	// Отправка метаданных
-	_, err = conn.Write(metadataJSON)
-	if err != nil {
-		return nil, fmt.Errorf("metadata send failed: %v", err)
-	}
-
-	// Отправка данных изображения
-	_, err = conn.Write(imageData)
-	if err != nil {
-		return nil, fmt.Errorf("image data send failed: %v", err)
-	}
-
-	// Получение ответа: заголовок
-	responseHeader := make([]byte, 4)
-	_, err = io.ReadFull(conn, responseHeader)
-	if err != nil {
-		return nil, fmt.Errorf("response header read failed: %v", err)
-	}
-
-	responseSize := binary.BigEndian.Uint32(responseHeader)
-
-	// Получение данных ответа
-	responseData := make([]byte, responseSize)
-	_, err = io.ReadFull(conn, responseData)
-	if err != nil {
-		return nil, fmt.Errorf("response data read failed: %v", err)
-	}
-
-	// Парсинг JSON ответа
-	var response SearchResponse
-	err = json.Unmarshal(responseData, &response)
-	if err != nil {
-		return nil, fmt.Errorf("JSON unmarshaling failed: %v", err)
-	}
-
-	return &response, nil
-}
-
-// ImageSearchRequest запрос от пользователя
-type ImageSearchRequest struct {
-	TopK    int  `form:"top_k" json:"top_k" binding:"min=1,max=100"`
-	NoCache bool `form:"no_cache" json:"no_cache"`
-}
-
-// ImageSearchHandler обработчик поиска по изображению
-func ImageSearchHandler(config PythonServerConfig) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		startTime := time.Now()
-
-		// Парсинг параметров запроса
-		//var requestParams ImageSearchRequest
-		//if err := c.ShouldBindQuery(&requestParams); err != nil {
-		//	c.JSON(http.StatusBadRequest, gin.H{
-		//		"success": false,
-		//		"error":   fmt.Sprintf("Invalid query parameters: %v", err),
-		//	})
-		//	return
-		//}
-
-		// Получение файла из запроса
-		file, err := c.FormFile("image")
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"success": false,
-				"error":   "Image file is required",
-			})
-			return
-		}
-
-		// Проверка размера файла (максимум 10MB)
-		if file.Size > 10*1024*1024 {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"success": false,
-				"error":   "Image size exceeds 10MB limit",
-			})
-			return
-		}
-
-		// Проверка типа файла
-		allowedTypes := map[string]bool{
-			"image/jpeg": true,
-			"image/jpg":  true,
-			"image/png":  true,
-		}
-		if !allowedTypes[file.Header.Get("Content-Type")] {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"success": false,
-				"error":   "Unsupported image format. Supported: JPEG, PNG",
-			})
-			return
-		}
-
-		// Чтение файла
-		openedFile, err := file.Open()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"success": false,
-				"error":   fmt.Sprintf("Failed to open file: %v", err),
-			})
-			return
-		}
-		defer openedFile.Close()
-
-		imageData, err := io.ReadAll(openedFile)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"success": false,
-				"error":   fmt.Sprintf("Failed to read file: %v", err),
-			})
-			return
-		}
-
-		// Вызов Python сервера
-		response, err := searchImage(
-			imageData,
-			9,
-			false,
-			config,
-		)
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"success":     false,
-				"error":       fmt.Sprintf("Search failed: %v", err),
-				"proxy_error": true,
-			})
-			return
-		}
-
-		// Добавляем время проксирования
-		proxyTime := time.Since(startTime).Seconds()
-		if response.ProcessingTime.TotalSeconds > 0 {
-			response.ProcessingTime.TotalSeconds += proxyTime
-		}
-
-		// Возвращаем ответ от Python сервера
-		if response.Success {
-			c.JSON(http.StatusOK, response)
-		} else {
-			c.JSON(http.StatusInternalServerError, response)
-		}
-	}
-}
-
-// HealthCheckHandler проверка здоровья Python сервера
-func HealthCheckHandler(config PythonServerConfig) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		serverAddr := fmt.Sprintf("%s:%d", config.Host, config.Port)
-
-		conn, err := net.DialTimeout("tcp", serverAddr, 5*time.Second)
-		if err != nil {
-			c.JSON(http.StatusServiceUnavailable, gin.H{
-				"status":   "unhealthy",
-				"service":  "python_search",
-				"error":    err.Error(),
-				"endpoint": serverAddr,
-			})
-			return
-		}
-		defer conn.Close()
-
-		c.JSON(http.StatusOK, gin.H{
-			"status":   "healthy",
-			"service":  "python_search",
-			"endpoint": serverAddr,
-		})
-	}
 }
