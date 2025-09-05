@@ -9,8 +9,9 @@ import (
 	"os/signal"
 	"syscall"
 	"web_profile/internal"
+	"web_profile/internal/server"
 	"web_profile/pkg/log"
-	"web_profile/pkg/server"
+	pkgServer "web_profile/pkg/server"
 )
 
 func main() {
@@ -39,8 +40,17 @@ func run(ctx context.Context) (err error) {
 	}
 
 	logger := log.NewLogger(level, []log.Listener{log.NewConsoleListener()})
-	httpServer := server.NewServer(logger, &config)
-	httpServer.SetTemplate(template.Must(template.ParseFiles("static/template/profile.html", "static/template/image_search.html", "static/template/404.html", "static/template/image_search_about.html")))
+	httpServer := server.Server{
+		Server: pkgServer.NewServer(
+			logger,
+			template.Must(template.ParseFiles("static/template/profile.html", "static/template/image_search.html", "static/template/404.html", "static/template/image_search_about.html")),
+			config,
+		),
+		TelegramConfig:    config,
+		ImageSearchConfig: config,
+	}
+
+	httpServer.SetupRoutes = httpServer.Routing
 
 	err = httpServer.Run(ctx)
 	if err != nil {

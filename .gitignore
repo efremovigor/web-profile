@@ -1,2 +1,3 @@
 .*
 app.*
+internal/generated/image_search/*

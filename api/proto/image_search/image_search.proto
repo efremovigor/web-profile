@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package image_search;
+
+option go_package = ".;pb";
+
+service ImageSearchService {
+  rpc SearchImage(SearchRequest) returns (SearchResponse);
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+message SearchRequest {
+  bytes image_data = 1;
+  int32 top_k = 2;
+  bool use_cache = 3;
+}
+
+message SearchResult {
+  string product_id = 1;
+  string category_id = 2;
+  double similarity = 3;
+  double distance = 4;
+  string product_url = 5;
+  string category_url = 6;
+  string image_url = 7;
+}
+
+message ProcessingTime {
+  double embedding_seconds = 1;
+  double search_seconds = 2;
+  double total_seconds = 3;
+}
+
+message SearchResponse {
+  bool success = 1;
+  repeated SearchResult results = 2;
+  string error = 3;
+  ProcessingTime processing_time = 4;
+  string device = 5;
+  bool cached = 6;
+}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  bool healthy = 1;
+  string status = 2;
+}
