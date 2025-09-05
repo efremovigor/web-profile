@@ -143,7 +143,7 @@ func (s *Server) ImageSearchHandler(config ImageSearchClientConfig) gin.HandlerF
 		// Добавляем время проксирования
 		proxyTime := time.Since(startTime).Seconds()
 		if jsonResponse.ProcessingTime.TotalSeconds > 0 {
-			jsonResponse.ProcessingTime.TotalSeconds += proxyTime
+			jsonResponse.ProcessingTime.TotalSeconds = proxyTime
 		}
 
 		if jsonResponse.Success {
