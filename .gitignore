@@ -1,3 +1,5 @@
 .*
 app.*
 internal/generated/image_search/*
+relative/image_search/image_search_pb2.py
+relative/image_search/image_search_pb2_grpc.py

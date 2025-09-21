@@ -3,9 +3,13 @@ set -euo pipefail
 
 APP_NAME="myapp"
 PID_FILE="app.pid"
+PYTHON_PID_FILE="python_app.pid"
 LOG_FILE="app.log"
+PYTHON_LOG_FILE="python_app.log"
 PROTO_DIR="api/proto"
 GENERATED_DIR="internal/generated"
+PYTHON_APP_DIR="relative/image_search"
+PYTHON_REQUIREMENTS="$PYTHON_APP_DIR/requirements.txt"
 
 echo ">>> Проверяем установку protoc"
 if ! command -v protoc &> /dev/null; then
@@ -49,7 +53,7 @@ echo ">>> Обновляем репозиторий"
 git fetch origin master
 git reset --hard origin/master
 
-echo ">>> Генерируем gRPC код"
+echo ">>> Генерируем gRPC код для Go"
 if [[ -d "$PROTO_DIR" ]]; then
     mkdir -p "$GENERATED_DIR/image_search"
 
@@ -60,10 +64,10 @@ if [[ -d "$PROTO_DIR" ]]; then
            image_search/image_search.proto
 
     if [[ -f "$GENERATED_DIR/image_search/image_search.pb.go" ]]; then
-        echo ">>> Генерация успешно завершена"
+        echo ">>> Генерация Go кода успешно завершена"
         ls -la "$GENERATED_DIR/image_search/"
     else
-        echo ">>> Ошибка: файлы не сгенерировались"
+        echo ">>> Ошибка: Go файлы не сгенерировались"
         exit 1
     fi
 else
@@ -71,27 +75,79 @@ else
     exit 1
 fi
 
-echo ">>> Обновляем зависимости"
+echo ">>> Генерируем gRPC код для Python"
+if [[ -d "$PYTHON_APP_DIR" ]]; then
+    echo ">>> Генерируем Python код из $PROTO_DIR/image_search/image_search.proto"
+    cd "$PYTHON_APP_DIR"
+    python -m grpc_tools.protoc -I../../api/proto/image_search/ \
+           --python_out=. \
+           --grpc_python_out=. \
+           ../../api/proto/image_search/image_search.proto
+    cd - > /dev/null
+
+    if [[ -f "$PYTHON_APP_DIR/image_search_pb2.py" ]] && [[ -f "$PYTHON_APP_DIR/image_search_pb2_grpc.py" ]]; then
+        echo ">>> Генерация Python кода успешно завершена"
+        ls -la "$PYTHON_APP_DIR/" | grep image_search
+    else
+        echo ">>> Ошибка: Python файлы не сгенерировались"
+        exit 1
+    fi
+else
+    echo ">>> Python app директория не найдена: $PYTHON_APP_DIR"
+    exit 1
+fi
+
+echo ">>> Устанавливаем Python зависимости"
+if [[ -f "$PYTHON_REQUIREMENTS" ]]; then
+    echo ">>> Устанавливаем зависимости из $PYTHON_REQUIREMENTS"
+    pip install -r "$PYTHON_REQUIREMENTS"
+else
+    echo ">>> requirements.txt не найден: $PYTHON_REQUIREMENTS"
+    exit 1
+fi
+
+echo ">>> Обновляем Go зависимости"
 go mod tidy
 
-echo ">>> Собираем приложение"
+echo ">>> Собираем Go приложение"
 go build -o "$APP_NAME" cmd/app/main.go
 
-# Останавливаем прошлый процесс, если есть
+# Останавливаем прошлые процессы Go, если есть
 if [[ -f "$PID_FILE" ]]; then
     OLD_PID=$(cat "$PID_FILE")
     if ps -p "$OLD_PID" > /dev/null 2>&1; then
-        echo ">>> Останавливаем предыдущий процесс (PID $OLD_PID)"
+        echo ">>> Останавливаем предыдущий Go процесс (PID $OLD_PID)"
         kill "$OLD_PID" || true
-        sleep 2  # Даем процессу время на graceful shutdown
+        sleep 2
     fi
     rm -f "$PID_FILE"
 fi
 
-echo ">>> Запускаем приложение"
-nohup "./$APP_NAME" > "$LOG_FILE" 2>&1 &
+# Останавливаем прошлые процессы Python, если есть
+if [[ -f "$PYTHON_PID_FILE" ]]; then
+    OLD_PYTHON_PID=$(cat "$PYTHON_PID_FILE")
+    if ps -p "$OLD_PYTHON_PID" > /dev/null 2>&1; then
+        echo ">>> Останавливаем предыдущий Python процесс (PID $OLD_PYTHON_PID)"
+        kill "$OLD_PYTHON_PID" || true
+        sleep 2
+    fi
+    rm -f "$PYTHON_PID_FILE"
+fi
 
-NEW_PID=$!
-echo "$NEW_PID" > "$PID_FILE"
-echo ">>> Приложение запущено (PID $NEW_PID)"
-echo ">>> Логи: tail -f $LOG_FILE"
+echo ">>> Запускаем Go приложение"
+nohup "./$APP_NAME" > "$LOG_FILE" 2>&1 &
+GO_PID=$!
+echo "$GO_PID" > "$PID_FILE"
+echo ">>> Go приложение запущено (PID $GO_PID)"
+echo ">>> Логи Go: tail -f $LOG_FILE"
+
+echo ">>> Запускаем Python демон"
+cd "$PYTHON_APP_DIR"
+nohup python image_search.py > "../$PYTHON_LOG_FILE" 2>&1 &
+PYTHON_PID=$!
+cd - > /dev/null
+echo "$PYTHON_PID" > "$PYTHON_PID_FILE"
+echo ">>> Python демон запущен (PID $PYTHON_PID)"
+echo ">>> Логи Python: tail -f $PYTHON_LOG_FILE"
+
+echo ">>> Деплой завершен успешно!"
