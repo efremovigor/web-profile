@@ -25,11 +25,32 @@ if ! command -v protoc &> /dev/null; then
     fi
 fi
 
+echo ">>> Проверяем установку Python"
+if ! command -v python3 &> /dev/null; then
+    echo ">>> Устанавливаем Python 3"
+    if [[ -f /etc/debian_version ]]; then
+        sudo apt-get update
+        sudo apt-get install -y python3 python3-pip python3-venv
+    elif [[ -f /etc/redhat-release ]]; then
+        sudo yum install -y python3 python3-pip
+    else
+        echo ">>> Не удалось определить ОС для установки Python"
+        exit 1
+    fi
+fi
+
+# Создаем симлинк python -> python3 если его нет
+if ! command -v python &> /dev/null; then
+    if command -v python3 &> /dev/null; then
+        ln -s $(which python3) /usr/local/bin/python
+    fi
+fi
+
 echo ">>> Устанавливаем Go плагины для protoc"
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
-# Добавляем GOBIН в PATH (ОЧЕНЬ ВАЖНО!)
+# Добавляем GOPATH в PATH
 export PATH="$PATH:$(go env GOPATH)/bin"
 
 echo ">>> Проверяем установку плагинов"
@@ -79,10 +100,11 @@ echo ">>> Генерируем gRPC код для Python"
 if [[ -d "$PYTHON_APP_DIR" ]]; then
     echo ">>> Генерируем Python код из $PROTO_DIR/image_search/image_search.proto"
     cd "$PYTHON_APP_DIR"
-    python -m venv .venv
-    source .venv/bin/activate
-    source .venv/bin/activate
-    python -m grpc_tools.protoc -I../../api/proto/image_search/ \
+
+    # Устанавливаем необходимые Python пакеты для генерации
+    pip3 install grpcio-tools
+
+    python3 -m grpc_tools.protoc -I../../api/proto/image_search/ \
            --python_out=. \
            --grpc_python_out=. \
            ../../api/proto/image_search/image_search.proto
@@ -103,7 +125,7 @@ fi
 echo ">>> Устанавливаем Python зависимости"
 if [[ -f "$PYTHON_REQUIREMENTS" ]]; then
     echo ">>> Устанавливаем зависимости из $PYTHON_REQUIREMENTS"
-    pip install -r "$PYTHON_REQUIREMENTS"
+    pip3 install -r "$PYTHON_REQUIREMENTS"
 else
     echo ">>> requirements.txt не найден: $PYTHON_REQUIREMENTS"
     exit 1
@@ -146,7 +168,7 @@ echo ">>> Логи Go: tail -f $LOG_FILE"
 
 echo ">>> Запускаем Python демон"
 cd "$PYTHON_APP_DIR"
-nohup python image_search.py > "../$PYTHON_LOG_FILE" 2>&1 &
+nohup python3 image_search.py > "../$PYTHON_LOG_FILE" 2>&1 &
 PYTHON_PID=$!
 cd - > /dev/null
 echo "$PYTHON_PID" > "$PYTHON_PID_FILE"
