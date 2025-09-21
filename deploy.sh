@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_NAME="web-profile"
+APP_NAME="app"
 PROTO_DIR="api/proto"
 GENERATED_DIR="internal/generated"
 PYTHON_APP_DIR="relative/image_search"
