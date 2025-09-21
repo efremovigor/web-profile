@@ -6,8 +6,8 @@ PROTO_DIR="api/proto"
 GENERATED_DIR="internal/generated"
 PYTHON_APP_DIR="relative/image_search"
 PYTHON_REQUIREMENTS="$PYTHON_APP_DIR/requirements.txt"
-GO_SERVICE="myapp-service"
-PYTHON_SERVICE="python-image-search-service"
+GO_SERVICE="web-profile-service"
+PYTHON_SERVICE="image-search-service"
 
 echo ">>> Проверяем установку protoc"
 if ! command -v protoc &> /dev/null; then
