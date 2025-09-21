@@ -79,6 +79,7 @@ echo ">>> Генерируем gRPC код для Python"
 if [[ -d "$PYTHON_APP_DIR" ]]; then
     echo ">>> Генерируем Python код из $PROTO_DIR/image_search/image_search.proto"
     cd "$PYTHON_APP_DIR"
+    source .venv/bin/activate
     python -m grpc_tools.protoc -I../../api/proto/image_search/ \
            --python_out=. \
            --grpc_python_out=. \
