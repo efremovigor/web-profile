@@ -6,8 +6,8 @@ PROTO_DIR="api/proto"
 GENERATED_DIR="internal/generated"
 PYTHON_APP_DIR="relative/image_search"
 PYTHON_REQUIREMENTS="$PYTHON_APP_DIR/requirements.txt"
-GO_SERVICE="web-profile-service"
-PYTHON_SERVICE="image-search-service"
+GO_SERVICE="myapp-service"
+PYTHON_SERVICE="python-image-search-service"
 
 echo ">>> Проверяем установку protoc"
 if ! command -v protoc &> /dev/null; then
@@ -41,14 +41,28 @@ protoc --go_out="$GENERATED_DIR" --go_opt=paths=source_relative \
 
 echo ">>> Генерируем gRPC код для Python"
 cd "$PYTHON_APP_DIR"
-python -m grpc_tools.protoc -I../../api/proto/image_search/ \
+python3 -m grpc_tools.protoc -I../../api/proto/image_search/ \
        --python_out=. \
        --grpc_python_out=. \
        ../../api/proto/image_search/image_search.proto
 cd - > /dev/null
 
 echo ">>> Устанавливаем Python зависимости"
-pip install -r "$PYTHON_REQUIREMENTS"
+# Используем python3 и pip3 чтобы избежать проблем с версиями
+if command -v pip3 &> /dev/null; then
+    pip3 install -r "$PYTHON_REQUIREMENTS"
+elif command -v python3 -m pip &> /dev/null; then
+    python3 -m pip install -r "$PYTHON_REQUIREMENTS"
+else
+    echo ">>> Ошибка: не найден pip3 или python3 -m pip"
+    echo ">>> Устанавливаем pip3"
+    if [[ -f /etc/debian_version ]]; then
+        sudo apt-get install -y python3-pip
+    elif [[ -f /etc/redhat-release ]]; then
+        sudo yum install -y python3-pip
+    fi
+    pip3 install -r "$PYTHON_REQUIREMENTS"
+fi
 
 echo ">>> Обновляем Go зависимости"
 go mod tidy
