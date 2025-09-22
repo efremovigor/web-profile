@@ -12,14 +12,23 @@ type Server struct {
 }
 
 func (s Server) Routing(r *gin.Engine) *gin.Engine {
-	r.GET("/profile", ProfilePage(s.Template, s.Logger))
-	r.GET("/image-search-about", ImageSearchAboutPage(s.Template, s.Logger))
-	r.GET("/image-search", ImageSearchPage(s.Template, s.Logger))
+	allFiles := []string{
+		"static/template/profile.html",
+		"static/template/404.html",
+		"static/template/demo/image_search/image_search.html",
+		"static/template/demo/image_search/image_search_about.html",
+	}
+
+	r.LoadHTMLFiles(allFiles...)
+
+	r.GET("/profile", ProfilePage())
 	r.POST("/send", GetInTouchHandler(s.TelegramConfig, s.Logger))
 	r.Static("/static", "./static")
 
-	r.NoRoute(Page404(s.Template, s.Logger))
+	r.NoRoute(Page404())
 
+	r.GET("/image-search-about", ImageSearchAboutPage())
+	r.GET("/image-search", ImageSearchPage())
 	r.POST("/image-search", s.ImageSearchHandler(s.ImageSearchConfig))
 	r.GET("/health/image-search", s.HealthCheckHandler(s.ImageSearchConfig))
 

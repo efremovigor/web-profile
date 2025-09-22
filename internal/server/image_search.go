@@ -4,40 +4,24 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"html/template"
 	"io"
 	"net/http"
 	"time"
 	pb "web_profile/internal/generated/image_search"
 	"web_profile/pkg/client"
-	"web_profile/pkg/log"
 )
 
-func ImageSearchAboutPage(tmpl *template.Template, logger *log.Logger) gin.HandlerFunc {
+func ImageSearchAboutPage() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Устанавливаем заголовок Content-Type
 		c.Header("Content-Type", "text/html; charset=utf-8")
-
-		// Выполняем шаблон и записываем результат в ResponseWriter
-		if err := tmpl.ExecuteTemplate(c.Writer, "image_search_about.html", nil); err != nil {
-			logger.Log(log.Exception(fmt.Sprintf("error rendering Template: %s", err), nil))
-			c.AbortWithStatus(http.StatusInternalServerError)
-			return
-		}
+		c.HTML(http.StatusOK, "image_search_about.html", nil)
 	}
 }
 
-func ImageSearchPage(tmpl *template.Template, logger *log.Logger) gin.HandlerFunc {
+func ImageSearchPage() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Устанавливаем заголовок Content-Type
 		c.Header("Content-Type", "text/html; charset=utf-8")
-
-		// Выполняем шаблон и записываем результат в ResponseWriter
-		if err := tmpl.ExecuteTemplate(c.Writer, "image_search.html", nil); err != nil {
-			logger.Log(log.Exception(fmt.Sprintf("error rendering Template: %s", err), nil))
-			c.AbortWithStatus(http.StatusInternalServerError)
-			return
-		}
+		c.HTML(http.StatusOK, "image_search.html", nil)
 	}
 }
 

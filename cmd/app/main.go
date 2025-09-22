@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"html/template"
 	"os"
 	"os/signal"
 	"syscall"
@@ -43,7 +42,6 @@ func run(ctx context.Context) (err error) {
 	httpServer := server.Server{
 		Server: pkgServer.NewServer(
 			logger,
-			template.Must(template.ParseFiles("static/template/profile.html", "static/template/image_search.html", "static/template/404.html", "static/template/image_search_about.html")),
 			config,
 		),
 		TelegramConfig:    config,

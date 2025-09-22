@@ -20,11 +20,10 @@ type ServerConfig interface {
 	IsDev() bool
 }
 
-func NewServer(logger *log.Logger, template *template.Template, config ServerConfig) Server {
+func NewServer(logger *log.Logger, config ServerConfig) Server {
 	return Server{
-		Logger:   logger,
-		Template: template,
-		Config:   config,
+		Logger: logger,
+		Config: config,
 	}
 }
 

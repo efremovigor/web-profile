@@ -396,7 +396,7 @@ class ImageSearchService(image_search_pb2_grpc.ImageSearchServiceServicer):
 
 def serve():
     try:
-        csv_path = 'petrovich_feed.csv'
+        csv_path = 'feed.csv'
         if len(sys.argv) > 1:
             csv_path = sys.argv[1]
 
