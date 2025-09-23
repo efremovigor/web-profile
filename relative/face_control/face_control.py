@@ -28,6 +28,7 @@ class FaceAnalysisServer:
         self.users_file = "../../tmp/face_control.json"
         self.users = self.load_users()
         self.similarity_threshold = 0.6
+        self.consistency_threshold = 0.7  # Порог для проверки постоянства лица
 
         self.liveness_sessions = {}
         self.registration_sessions = {}
@@ -91,6 +92,46 @@ class FaceAnalysisServer:
             logger.error(f"Error decoding image: {e}")
             return None
 
+    def calculate_similarity(self, embedding1, embedding2):
+        """Вычисляет косинусное сходство между двумя эмбеддингами"""
+        try:
+            emb1 = np.array(embedding1)
+            emb2 = np.array(embedding2)
+            similarity = np.dot(emb1, emb2) / (np.linalg.norm(emb1) * np.linalg.norm(emb2))
+            return float(similarity)  # Преобразуем в стандартный float
+        except Exception as e:
+            logger.error(f"Error calculating similarity: {e}")
+            return 0.0
+
+    def is_user_already_registered(self, new_embedding):
+        """Проверяет, не зарегистрирован ли уже пользователь с похожим лицом"""
+        with self.lock:
+            for user_id, user_data in self.users.items():
+                stored_embedding = user_data["embedding"]
+                similarity = self.calculate_similarity(new_embedding, stored_embedding)
+
+                if similarity > self.similarity_threshold:
+                    logger.info(f"User {user_id} already registered with similarity: {similarity:.4f}")
+                    return True, user_id, similarity
+
+            return False, None, 0.0
+
+    def check_face_consistency(self, current_embedding, reference_embeddings):
+        """Проверяет, что текущее лицо соответствует предыдущим эмбеддингам сессии"""
+        if not reference_embeddings:
+            return True, 1.0  # Нет предыдущих эмбеддингов для сравнения
+
+        similarities = []
+        for ref_embedding in reference_embeddings:
+            similarity = self.calculate_similarity(current_embedding, ref_embedding)
+            similarities.append(similarity)
+
+        avg_similarity = float(np.mean(similarities)) if similarities else 0.0  # Преобразуем в float
+        is_consistent = avg_similarity > self.consistency_threshold
+
+        logger.info(f"Face consistency check: avg_similarity={avg_similarity:.4f}, consistent={is_consistent}")
+        return is_consistent, avg_similarity
+
     def start_registration(self, first_name, last_name):
         with self.lock:
             user_id = f"{first_name}_{last_name}".lower()
@@ -116,7 +157,9 @@ class FaceAnalysisServer:
                 "stages": stages,
                 "current_stage": 0,
                 "stage_start_time": time.time(),
-                "stage_timeout": self.stage_timeout
+                "stage_timeout": self.stage_timeout,
+                "reference_embeddings": [],  # Эмбеддинги для проверки постоянства
+                "consistency_checked": False
             }
 
             logger.info(f"Started registration for {first_name} {last_name}, session: {session_id}")
@@ -153,10 +196,12 @@ class FaceAnalysisServer:
         quality_issues = []
         det_score = 0
         face_embedding = None
+        consistency_ok = True
+        consistency_score = 1.0
 
         if len(faces) == 1:
             face = faces[0]
-            det_score = float(face.det_score)
+            det_score = float(face.det_score)  # Преобразуем в стандартный float
             head_pose = self.get_head_pose(face)
             quality_ok, quality_issues = self.check_face_quality(face, frame)
 
@@ -164,6 +209,21 @@ class FaceAnalysisServer:
 
             if head_pose == stage["name"] and quality_ok and not stage["completed"]:
                 face_embedding = face.embedding.tolist()
+
+                # Проверяем постоянство лица (кроме первого кадра)
+                with self.lock:
+                    if session_data["reference_embeddings"]:
+                        consistency_ok, consistency_score = self.check_face_consistency(
+                            face_embedding, session_data["reference_embeddings"]
+                        )
+
+                    if consistency_ok:
+                        # Добавляем в reference embeddings для будущих проверок
+                        session_data["reference_embeddings"].append(face_embedding)
+                        logger.info(f"Face consistency check passed: {consistency_score:.4f}")
+                    else:
+                        logger.warning(f"Face consistency check failed: {consistency_score:.4f}")
+
                 logger.info(f"Valid face found for stage {stage['name']}")
 
         with self.lock:
@@ -174,9 +234,11 @@ class FaceAnalysisServer:
             current_stage_idx = session_data["current_stage"]
             stage = session_data["stages"][current_stage_idx]
 
-            # Добавляем embedding если подходит
+            # Добавляем embedding если подходит и прошло проверку постоянства
             if (face_embedding and head_pose == stage["name"] and quality_ok and
-                    not stage["completed"] and len(stage["embeddings"]) < stage["min_embeddings"] + 5):
+                    consistency_ok and not stage["completed"] and
+                    len(stage["embeddings"]) < stage["min_embeddings"] + 5):
+
                 stage["embeddings"].append(face_embedding)
                 logger.info(f"Added embedding to stage {stage['name']}, total: {len(stage['embeddings'])}")
 
@@ -191,7 +253,24 @@ class FaceAnalysisServer:
                     for s in session_data["stages"]:
                         all_embeddings.extend(s["embeddings"])
 
+                    # Создаем усредненный эмбеддинг
                     avg_embedding = np.mean(all_embeddings, axis=0).tolist()
+
+                    # Проверяем, не зарегистрирован ли уже пользователь
+                    already_registered, existing_user_id, similarity = self.is_user_already_registered(avg_embedding)
+
+                    if already_registered:
+                        # Удаляем сессию
+                        del self.registration_sessions[session_id]
+
+                        logger.warning(f"User already registered: {existing_user_id} (similarity: {similarity:.4f})")
+                        return {
+                            "status": "already_registered",
+                            "message": f"Пользователь уже зарегистрирован (сходство: {similarity:.2%})",
+                            "existing_user_id": existing_user_id,
+                            "similarity": similarity
+                        }
+
                     user_id = session_data["user_id"]
 
                     self.users[user_id] = {
@@ -219,22 +298,24 @@ class FaceAnalysisServer:
                     session_data["stage_start_time"] = time.time()
                     logger.info(f"Moving to next stage: {session_data['current_stage']}")
 
-            # Подготавливаем ответ
+            # Подготавливаем ответ - ВАЖНО: преобразуем все NumPy типы в стандартные Python типы
             current_stage_idx = session_data["current_stage"]
             stage = session_data["stages"][current_stage_idx]
 
             response = {
                 "status": "processing",
-                "current_stage": current_stage_idx,
+                "current_stage": int(current_stage_idx),  # Преобразуем в int
                 "stage_name": stage["name"],
-                "collected": len(stage["embeddings"]),
-                "needed": stage["min_embeddings"],
+                "collected": int(len(stage["embeddings"])),  # Преобразуем в int
+                "needed": int(stage["min_embeddings"]),  # Преобразуем в int
                 "head_pose": head_pose,
-                "quality_ok": quality_ok,
+                "quality_ok": bool(quality_ok),  # Преобразуем в bool
                 "quality_issues": quality_issues,
-                "faces_count": len(faces),
-                "det_score": det_score,
-                "stage_completed": stage["completed"]
+                "faces_count": int(len(faces)),  # Преобразуем в int
+                "det_score": float(det_score),  # Преобразуем в float
+                "stage_completed": bool(stage["completed"]),  # Преобразуем в bool
+                "face_consistent": bool(consistency_ok),  # Преобразуем в bool
+                "consistency_score": float(consistency_score)  # Преобразуем в float
             }
 
             logger.info(f"Response: {response}")
@@ -250,7 +331,6 @@ class FaceAnalysisServer:
 
         return response
 
-    # Добавим остальные необходимые методы
     def get_head_pose(self, face):
         """Определяет позу головы"""
         try:
@@ -301,6 +381,7 @@ class FaceAnalysisServer:
         except Exception as e:
             logger.error(f"Error checking face quality: {e}")
             return False, ["Ошибка проверки качества"]
+
     def start_liveness_check(self):
         """Начинает проверку живости"""
         session_id = str(time.time())
@@ -310,7 +391,8 @@ class FaceAnalysisServer:
             'required_poses': ['center', 'right', 'left', 'center'],
             'current_step': 0,
             'completed': False,
-            'last_pose_time': time.time()
+            'last_pose_time': time.time(),
+            'reference_embedding': None  # Для проверки постоянства лица
         }
         logger.info(f"Started liveness check session: {session_id}")
         return {"session_id": session_id, "instruction": "Смотрите прямо в камеру"}
@@ -350,6 +432,25 @@ class FaceAnalysisServer:
 
         face = faces[0]
         current_pose = self.get_head_pose(face)
+        current_embedding = face.embedding.tolist()
+
+        # Проверяем постоянство лица
+        if session['reference_embedding'] is None:
+            session['reference_embedding'] = current_embedding
+        else:
+            consistency_ok, consistency_score = self.check_face_consistency(
+                current_embedding, [session['reference_embedding']]
+            )
+            if not consistency_ok:
+                return {
+                    "session_id": session_id,
+                    "instruction": "Обнаружено другое лицо! Продолжайте проверку с исходным лицом",
+                    "current_step": session['current_step'],
+                    "total_steps": len(session['required_poses']),
+                    "completed": False,
+                    "face_changed": True
+                }
+
         session['poses'].append(current_pose)
 
         # Проверяем текущую требуемую позу
@@ -458,7 +559,7 @@ class FaceAnalysisServer:
             }
 
         logger.info("Authentication failed - no matching user found")
-        return {'authenticated': False, 'error': 'Authentication failed'}
+        return {'authenticated': False, 'error': 'Authentication failed - пользователь не найден'}
 
     def cleanup_sessions(self):
         """Очищает старые сессии"""
@@ -549,8 +650,6 @@ def cancel_registration():
     except Exception as e:
         logger.error(f"Error in cancel_registration: {e}")
         return jsonify({"error": str(e)}), 500
-
-# Добавьте остальные endpoint'ы по аналогии...
 
 @app.route('/start_liveness', methods=['POST'])
 def start_liveness():

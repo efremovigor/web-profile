@@ -189,6 +189,12 @@ class FaceRecognitionApp {
                 return;
             }
 
+            if (data.status === 'already_registered') {
+                this.showStatus('registration', 'error', data.message);
+                this.stopRegistration(true);
+                return;
+            }
+
             if (data.status === 'completed') {
                 this.finalizeRegistrationUI();
                 this.showStatus('registration', 'success', data.message || 'Регистрация завершена успешно!');

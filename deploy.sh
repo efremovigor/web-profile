@@ -6,8 +6,11 @@ PROTO_DIR="api/proto"
 GENERATED_DIR="internal/generated"
 PYTHON_APP_DIR="relative/image_search"
 PYTHON_REQUIREMENTS="$PYTHON_APP_DIR/requirements.txt"
+FACE_CONTROL_DIR="relative/face_control"
+FACE_CONTROL_REQUIREMENTS="$FACE_CONTROL_DIR/requirements.txt"
 GO_SERVICE="web-profile"
 PYTHON_SERVICE="image-search"
+FACE_CONTROL_SERVICE="face-control"
 
 echo ">>> Проверяем установку protoc"
 if ! command -v protoc &> /dev/null; then
@@ -47,7 +50,7 @@ python3 -m grpc_tools.protoc -I../../api/proto/image_search/ \
        ../../api/proto/image_search/image_search.proto
 cd - > /dev/null
 
-echo ">>> Устанавливаем Python зависимости"
+echo ">>> Устанавливаем Python зависимости для image-search"
 # Используем python3 и pip3 чтобы избежать проблем с версиями
 if command -v pip3 &> /dev/null; then
     pip3 install -r "$PYTHON_REQUIREMENTS"
@@ -64,6 +67,15 @@ else
     pip3 install -r "$PYTHON_REQUIREMENTS"
 fi
 
+echo ">>> Устанавливаем Python зависимости для face-control"
+if command -v pip3 &> /dev/null; then
+    pip3 install -r "$FACE_CONTROL_REQUIREMENTS"
+elif command -v python3 -m pip &> /dev/null; then
+    python3 -m pip install -r "$FACE_CONTROL_REQUIREMENTS"
+else
+    pip3 install -r "$FACE_CONTROL_REQUIREMENTS"
+fi
+
 echo ">>> Обновляем Go зависимости"
 go mod tidy
 
@@ -77,10 +89,15 @@ echo ">>> Перезапускаем Go сервис"
 sudo systemctl restart "$GO_SERVICE"
 sudo systemctl status "$GO_SERVICE" --no-pager -l
 
-echo ">>> Перезапускаем Python сервис"
+echo ">>> Перезапускаем Python сервис image-search"
 sudo systemctl restart "$PYTHON_SERVICE"
 sudo systemctl status "$PYTHON_SERVICE" --no-pager -l
 
+echo ">>> Перезапускаем Python сервис face-control"
+sudo systemctl restart "$FACE_CONTROL_SERVICE"
+sudo systemctl status "$FACE_CONTROL_SERVICE" --no-pager -l
+
 echo ">>> Деплой завершен успешно!"
 echo ">>> Логи Go: sudo journalctl -u $GO_SERVICE -f"
-echo ">>> Логи Python: sudo journalctl -u $PYTHON_SERVICE -f"
+echo ">>> Логи Python image-search: sudo journalctl -u $PYTHON_SERVICE -f"
+echo ">>> Логи Python face-control: sudo journalctl -u $FACE_CONTROL_SERVICE -f"
