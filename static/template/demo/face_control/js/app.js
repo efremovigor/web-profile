@@ -1,6 +1,6 @@
 class FaceRecognitionApp {
     constructor() {
-        this.baseURL = 'http://127.0.01:8081';
+        this.baseURL = '';
         this.initializeElements();
         this.initializeEventListeners();
         this.currentTab = 'registration';
