@@ -45,4 +45,9 @@ message HealthCheckRequest {}
 message HealthCheckResponse {
   bool healthy = 1;
   string status = 2;
+  bool model_loaded = 3;
+  bool index_loaded = 4;
+  bool meta_loaded = 5;
+  bool csv_loaded = 6;
+  bool gpu_available = 7;
 }

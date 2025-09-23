@@ -5,3 +5,4 @@ relative/image_search/image_search_pb2.py
 relative/image_search/image_search_pb2_grpc.py
 relative/image_search/feed.csv
 relative/image_search/index/*
+tmp/*

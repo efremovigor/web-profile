@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" href="static/favicon.ico" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition System</title>
+        <link rel="stylesheet" href="/static/template/demo/face_control/css/style.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Face Recognition System</h1>
+        <p>Регистрация и аутентификация по лицу</p>
+    </header>
+
+    <div class="tabs">
+        <div class="tab active" data-tab="registration">Регистрация</div>
+        <div class="tab" data-tab="authentication">Поиск</div>
+    </div>
+
+    <div class="content">
+        <!-- Регистрация -->
+        <div class="tab-content active" id="registration-tab">
+            <div class="form-group">
+                <input type="text" id="firstName" placeholder="Имя" required>
+                <input type="text" id="lastName" placeholder="Фамилия" required>
+            </div>
+
+            <div class="video-container">
+                <video id="registrationVideo" autoplay playsinline></video>
+                <canvas class="canvas-overlay" id="registrationCanvas"></canvas>
+            </div>
+
+            <div class="controls">
+                <button id="startRegistration">Начать регистрацию</button>
+                <button id="stopRegistration" disabled>Остановить</button>
+            </div>
+
+            <div class="stages" id="registrationStages">
+                <div class="stage" data-stage="center">
+                    <h3>Прямо</h3>
+                    <div class="progress">0/10</div>
+                </div>
+                <div class="stage" data-stage="right">
+                    <h3>Вправо</h3>
+                    <div class="progress">0/6</div>
+                </div>
+                <div class="stage" data-stage="left">
+                    <h3>Влево</h3>
+                    <div class="progress">0/6</div>
+                </div>
+            </div>
+
+            <div class="status" id="registrationStatus">
+                <div class="instructions">Готов к началу регистрации</div>
+                <div id="qualityInfo"></div>
+                <div id="debugInfo" class="debug-info" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Аутентификация -->
+        <div class="tab-content" id="authentication-tab">
+            <div class="video-container">
+                <video id="authVideo" autoplay playsinline></video>
+                <canvas class="canvas-overlay" id="authCanvas"></canvas>
+            </div>
+
+            <div class="controls">
+                <button id="startAuth">Начать поиск</button>
+                <button id="stopAuth" disabled>Остановить</button>
+            </div>
+
+            <div class="status" id="authStatus">
+                <div class="instructions">Готов к началу поиска</div>
+                <div id="authProgress"></div>
+                <div id="authDebugInfo" class="debug-info" style="display: none;"></div>
+            </div>
+
+            <div class="results" id="authResults" style="display: none;">
+                <h3>Результаты поиска</h3>
+                <div id="userResult"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/template/demo/face_control/js/utils.js"></script>
+<script src="/static/template/demo/face_control/js/app.js"></script>
+</body>
+</html>

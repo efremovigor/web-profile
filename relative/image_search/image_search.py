@@ -351,18 +351,27 @@ class ImageSearchService(image_search_pb2_grpc.ImageSearchServiceServicer):
 
     def HealthCheck(self, request, context):
         response = image_search_pb2.HealthCheckResponse()
+
+        # Проверяем статусы компонентов
         checks = {
             "model_loaded": self._model is not None,
             "index_loaded": self._index is not None,
             "meta_loaded": self._meta is not None,
             "csv_loaded": self._product_images_dict is not None,
-            "gpu_available": torch.cuda.is_available()
         }
-        response.healthy = all(checks.values())
-        response.status = "healthy" if response.healthy else "unhealthy"
-        for check_name, check_result in checks.items():
-            # предполагается, что в proto есть соответствующие булевы поля
-            setattr(response, check_name, check_result)
+
+        # Определяем общий статус здоровья
+        all_healthy = all(checks.values())
+        response.healthy = all_healthy
+        response.status = "healthy" if all_healthy else "unhealthy"
+
+        checks["gpu_available"] = torch.cuda.is_available()
+
+        # Дополнительная информация в лог для отладки
+        if not all_healthy:
+            failed_checks = [name for name, status in checks.items() if not status]
+            logger.warning(f"Health check failed for: {', '.join(failed_checks)}")
+
         return response
 
     def graceful_shutdown(self, server, timeout: int = 5) -> None:

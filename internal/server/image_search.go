@@ -11,18 +11,14 @@ import (
 	"web_profile/pkg/client"
 )
 
-func ImageSearchAboutPage() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Header("Content-Type", "text/html; charset=utf-8")
-		c.HTML(http.StatusOK, "image_search_about.html", nil)
-	}
+func imageSearchAboutPage(c *gin.Context) {
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	c.HTML(http.StatusOK, "image_search_about.html", nil)
 }
 
-func ImageSearchPage() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Header("Content-Type", "text/html; charset=utf-8")
-		c.HTML(http.StatusOK, "image_search.html", nil)
-	}
+func imageSearchPage(c *gin.Context) {
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	c.HTML(http.StatusOK, "image_search.html", nil)
 }
 
 type ImageSearchClientConfig interface {
