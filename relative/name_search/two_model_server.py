@@ -182,7 +182,7 @@ def generate_html(results=None, query='', error=None):
         for product in results['e5']['results']:
             html += f'''
                 <div class="product-card">
-                    <h3>{product['product_name']}</h3>
+                    <h3><a href="https://petrovich.ru/product/{product['product_id']}">{product['product_name']}</a></h3>
                     <p><strong>Категория:</strong> {product['category_name']}</p>
                     <p class="product-score">Score: {product['score']:.4f}</p>
             '''
@@ -207,7 +207,7 @@ def generate_html(results=None, query='', error=None):
         for product in results['sber']['results']:
             html += f'''
                 <div class="product-card">
-                    <h3>{product['product_name']}</h3>
+                    <h3><a href="https://petrovich.ru/product/{product['product_id']}">{product['product_name']}</a></h3>
                     <p><strong>Категория:</strong> {product['category_name']}</p>
                     <p class="product-score">Score: {product['score']:.4f}</p>
             '''
@@ -232,7 +232,7 @@ def generate_html(results=None, query='', error=None):
         for product in results['baai']['results']:
             html += f'''
                 <div class="product-card">
-                    <h3>{product['product_name']}</h3>
+                    <h3><a href="https://petrovich.ru/product/{product['product_id']}">{product['product_name']}</a></h3>
                     <p><strong>Категория:</strong> {product['category_name']}</p>
                     <p class="product-score">Score: {product['score']:.4f}</p>
             '''
