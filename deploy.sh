@@ -44,25 +44,25 @@ protoc --go_out="$GENERATED_DIR" --go_opt=paths=source_relative \
 
 echo ">>> Генерируем gRPC код для Python"
 cd "$PYTHON_APP_DIR"
-python3 -m grpc_tools.protoc -I../../api/proto/image_search/ \
+python3.13 -m grpc_tools.protoc -I../../api/proto/image_search/ \
        --python_out=. \
        --grpc_python_out=. \
        ../../api/proto/image_search/image_search.proto
 cd - > /dev/null
 
 echo ">>> Устанавливаем Python зависимости для image-search"
-# Используем python3 и pip3 чтобы избежать проблем с версиями
+# Используем python3.13 и pip3 чтобы избежать проблем с версиями
 if command -v pip3 &> /dev/null; then
     pip3 install -r "$PYTHON_REQUIREMENTS"
-elif command -v python3 -m pip &> /dev/null; then
-    python3 -m pip install -r "$PYTHON_REQUIREMENTS"
+elif command -v python3.13 -m pip &> /dev/null; then
+    python3.13 -m pip install -r "$PYTHON_REQUIREMENTS"
 else
-    echo ">>> Ошибка: не найден pip3 или python3 -m pip"
+    echo ">>> Ошибка: не найден pip3 или python3.13 -m pip"
     echo ">>> Устанавливаем pip3"
     if [[ -f /etc/debian_version ]]; then
-        sudo apt-get install -y python3-pip
+        sudo apt-get install -y python3.13-pip
     elif [[ -f /etc/redhat-release ]]; then
-        sudo yum install -y python3-pip
+        sudo yum install -y python3.13-pip
     fi
     pip3 install -r "$PYTHON_REQUIREMENTS"
 fi
@@ -70,8 +70,8 @@ fi
 echo ">>> Устанавливаем Python зависимости для face-control"
 if command -v pip3 &> /dev/null; then
     pip3 install -r "$FACE_CONTROL_REQUIREMENTS"
-elif command -v python3 -m pip &> /dev/null; then
-    python3 -m pip install -r "$FACE_CONTROL_REQUIREMENTS"
+elif command -v python3.13 -m pip &> /dev/null; then
+    python3.13 -m pip install -r "$FACE_CONTROL_REQUIREMENTS"
 else
     pip3 install -r "$FACE_CONTROL_REQUIREMENTS"
 fi
