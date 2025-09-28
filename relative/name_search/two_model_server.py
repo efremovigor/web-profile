@@ -68,12 +68,6 @@ def load_models_and_indexes():
         }
     }
 
-@app.before_first_request
-def initialize():
-    """Инициализация моделей перед первым запросом"""
-    global models_data
-    models_data = load_models_and_indexes()
-
 def search_in_model(query, model_type, k=9):
     """Поиск в конкретной модели"""
     model_data = models_data[model_type]
