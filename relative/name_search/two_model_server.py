@@ -6,6 +6,7 @@ from sentence_transformers import SentenceTransformer
 import torch
 from collections import Counter
 import logging
+import concurrent.futures
 
 # Настраиваем логирование
 logging.basicConfig(level=logging.INFO)
@@ -13,21 +14,31 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# Загружаем модели и индексы
+# Глобальные переменные для предзагруженных моделей
+models_data = None
+
 def load_models_and_indexes():
-    """Загружаем все модели и соответствующие индексы"""
+    """Загружаем все модели и соответствующие индексы один раз при старте"""
+    logger.info("Начинаем загрузку моделей и индексов...")
 
     # Модели
+    logger.info("Загрузка E5 модели...")
     e5_model = SentenceTransformer("intfloat/multilingual-e5-large")
+
+    logger.info("Загрузка Sber модели...")
     sber_model = SentenceTransformer("sberbank-ai/sbert_large_nlu_ru")
+
+    logger.info("Загрузка BAAI модели...")
     baai_model = SentenceTransformer("BAAI/bge-m3")
 
     # Индексы FAISS
+    logger.info("Загрузка FAISS индексов...")
     e5_index = faiss.read_index("faiss_index/products_index.index")
     sber_index = faiss.read_index("faiss_index_sber/products_index.index")
     baai_index = faiss.read_index("faiss_index_baai/products_index.index")
 
     # Метаданные
+    logger.info("Загрузка метаданных...")
     with open("faiss_index/products_index_metadata.pkl", 'rb') as f:
         e5_metadata = pickle.load(f)
 
@@ -36,6 +47,8 @@ def load_models_and_indexes():
 
     with open("faiss_index_baai/products_index_metadata.pkl", 'rb') as f:
         baai_metadata = pickle.load(f)
+
+    logger.info("Все модели и индексы успешно загружены!")
 
     return {
         'e5': {
@@ -55,8 +68,11 @@ def load_models_and_indexes():
         }
     }
 
-# Глобальные переменные с моделями и индексами
-models_data = load_models_and_indexes()
+@app.before_first_request
+def initialize():
+    """Инициализация моделей перед первым запросом"""
+    global models_data
+    models_data = load_models_and_indexes()
 
 def search_in_model(query, model_type, k=9):
     """Поиск в конкретной модели"""
@@ -68,8 +84,13 @@ def search_in_model(query, model_type, k=9):
     else:
         query_text = query
 
-    # Создаем эмбеддинг запроса
-    query_embedding = model_data['model'].encode([query_text]).astype('float32')
+    # Создаем эмбеддинг запроса с отключением прогресс-бара
+    query_embedding = model_data['model'].encode(
+        [query_text],
+        show_progress_bar=False,  # Отключаем прогресс-бар
+        convert_to_numpy=True,
+        normalize_embeddings=True
+    ).astype('float32')
 
     # Ищем в индексе
     distances, indices = model_data['index'].search(query_embedding, k)
@@ -89,6 +110,21 @@ def search_in_model(query, model_type, k=9):
             })
 
     return results
+
+def search_all_models_parallel(query, k=9):
+    """Параллельный поиск по всем моделям"""
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        # Запускаем поиск параллельно
+        future_e5 = executor.submit(search_in_model, query, 'e5', k)
+        future_sber = executor.submit(search_in_model, query, 'sber', k)
+        future_baai = executor.submit(search_in_model, query, 'baai', k)
+
+        # Получаем результаты
+        e5_results = future_e5.result()
+        sber_results = future_sber.result()
+        baai_results = future_baai.result()
+
+    return e5_results, sber_results, baai_results
 
 def get_top_categories(results, top_k=5):
     """Получаем топ категорий из результатов поиска"""
@@ -121,6 +157,7 @@ def generate_html(results=None, query='', error=None):
             .categories-list {{ background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 20px; }}
             .category-item {{ margin-bottom: 5px; }}
             .error {{ color: red; padding: 10px; background: #ffe6e6; border-radius: 5px; }}
+            .loading {{ color: #007bff; padding: 10px; }}
         </style>
     </head>
     <body>
@@ -235,10 +272,12 @@ def search():
     logger.info(f"Поисковый запрос: {query}")
 
     try:
-        # Ищем во всех моделях
-        e5_results = search_in_model(query, 'e5', k=9)
-        sber_results = search_in_model(query, 'sber', k=9)
-        baai_results = search_in_model(query, 'baai', k=9)
+        # Проверяем, загружены ли модели
+        if models_data is None:
+            return generate_html(error="Модели еще загружаются, попробуйте позже", query=query)
+
+        # Ищем во всех моделях параллельно
+        e5_results, sber_results, baai_results = search_all_models_parallel(query, k=9)
 
         # Получаем топ категории для каждой модели
         e5_categories = get_top_categories(e5_results, 5)
@@ -275,10 +314,12 @@ def api_search():
         return jsonify({'error': 'Пустой запрос'}), 400
 
     try:
-        # Ищем во всех моделях
-        e5_results = search_in_model(query, 'e5', k=9)
-        sber_results = search_in_model(query, 'sber', k=9)
-        baai_results = search_in_model(query, 'baai', k=9)
+        # Проверяем, загружены ли модели
+        if models_data is None:
+            return jsonify({'error': 'Модели еще загружаются, попробуйте позже'}), 503
+
+        # Ищем во всех моделях параллельно
+        e5_results, sber_results, baai_results = search_all_models_parallel(query, k=9)
 
         # Получаем топ категории для каждой модели
         e5_categories = get_top_categories(e5_results, 5)
@@ -311,4 +352,6 @@ def api_search():
 
 if __name__ == '__main__':
     logger.info("Запуск веб-сервиса...")
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Предзагружаем модели сразу при запуске
+    models_data = load_models_and_indexes()
+    app.run(host='0.0.0.0', port=8080, debug=False)  # debug=False для production
